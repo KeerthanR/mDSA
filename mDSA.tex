@@ -1,0 +1,99 @@
+%\documentclass[a4paper, 11pt]{llncs}
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{amsmath,amssymb}
+\usepackage{stmaryrd}
+\usepackage{tikz}
+\usepackage{url}
+\ifCLASSOPTIONcompsoc
+% requires cite.sty v4.0 or later (November 2003)
+\usepackage[nocompress]{cite}
+\else
+\usepackage{cite}
+\fi
+
+%% Macros
+
+% Greek
+\newtheorem{definition}{Definition}
+
+\newtheorem{example}{Example}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+%\newtheorem{proof}{IEEEproof}
+\newtheorem{theorem}{Theorem}
+
+\renewcommand{\a}{\alpha}
+\renewcommand{\b}{\beta}
+\newcommand{\s}{\sigma}
+\renewcommand{\d}{\delta}
+\newcommand{\e}{\epsilon}
+\newcommand{\m}{\mu}
+
+\newcommand{\D}{\Delta}
+
+\newcommand{\rr}{\mathsf{r}}
+\newcommand{\bb}{\mathsf{b}}
+\renewcommand{\gg}{\mathsf{g}}
+\newcommand{\yy}{\mathsf{y}}
+\newcommand{\ww}{\mathsf{w}}
+% Mathcal
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Ll}{\mathcal{L}}
+\newcommand{\Oo}{\mathcal{O}}
+\newcommand{\Ss}{\mathcal{S}}
+\newcommand{\Ww}{\mathcal{W}}
+% Symbols
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\xra}{\xrightarrow}
+\newcommand{\Land}{\bigwedge}
+\newcommand{\incl}{\subseteq}
+
+% Misc
+\newcommand{\ssczo}{C_{0 \to 1}}
+\newcommand{\coz}{C_{1 \to 0}}
+\newcommand{\sem}[1]{\llbracket #1 \rrbracket}
+%\renewcommand{\sp}{\operatorname{SP}}
+%\renewcommand{\sp}{\sigma}
+\renewcommand{\sp}{\mathcal{S}\mathcal{L}}
+\newcommand{\context}{\mathcal{C}}
+\newcommand{\border}{\mathcal{B}}
+\newcommand{\nbd}{(\mathcal{C} + \mathcal{B})}
+\newcommand{\prfx}{\sqsubseteq_{\mathsf {pr}}}
+\newcommand{\pprfx}{\sqsubset_{\mathsf {pr}}}
+\newcommand{\sfx}{\sqsubseteq_{\mathsf {sf}}}
+\newcommand{\psfx}{\sqsubset_{\mathsf {sf}}}
+\newcommand{\proj}[1]{\mathsf{P}_{#1}}
+\newcommand{\spm}{\sp^{\mathsf{m}}}
+\newcommand{\sfxm}{\sfx^{\mathsf{m}}}
+\newcommand{\psfxm}{\psfx^{\mathsf{m}}}
+\renewcommand{\IEEEQED}{\IEEEQEDopen}
+
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\coNP}{\mathsf{coNP}}
+\newcommand{\vertex}{\textsc{VertexCover}~}
+\newcommand{\mdsa}{DSA$^{\mathsf{m}}$}
+
+\newcommand{\out}{\operatorname{Out}}
+\newcommand{\outp}{\operatorname{Out}_{\sqsubset}}
+
+\newcommand{\lsfx}[1]{\sqsubseteq_{\scriptscriptstyle
+    \mathsf{lsf}}^{\scriptscriptstyle #1}}
+\newcommand{\sub}{\sqsubseteq_{\mathsf{sub}}}
+\newcommand{\rsub}{\sqsubset_{\mathsf{sub}^{\mathsf{r}}}}
+\renewcommand{\e}{\varepsilon}
+\renewcommand{\epsilon}{\e}
+
+\begin{document}
+\title{Suffix-reading automata in a practical setting}
+
+\maketitle
+
+\input{definition.tex}
+
+\bibliographystyle{plain}
+\bibliography{dsa}
+
+\end{document}	
