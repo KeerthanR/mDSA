@@ -10,7 +10,7 @@ look at DFAs over such multi-port alphabets. Such DFAs model systems
 that listen to inputs from different processes and perform actions
 based on them. Sometimes the order in which the system receives its
 inputs from different ports is not relevant.%
-
+  
 For example, at a state
 $s$, if the system receives $a$ from port 1 and $b$ from port 2, in any
 order, then it has to go to state $t$.  A DFA would model this with
@@ -168,6 +168,9 @@ Transitions must then be enhanced in our semantics i.e.  a transition $(q, (u_1,
 
 
 
-\bibliographystyle{plain}
-\bibliography{main-edt-synthesis}
-\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "mDSA"
+%%% End:

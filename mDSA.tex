@@ -93,6 +93,40 @@
 
 \input{definition.tex}
 
+\section{Todos.}
+
+\begin{itemize}
+\item Compare the succinctness of mDSAs with DSAs. Understanding the
+  effect of partitioning the alphabet and the automaton having the
+  ability to treat them as independent events. We expect exponential
+  succinctness easily, in terms of the number of input variables.
+
+\item Comparison of mDSAs with streaming string transducers. Seem
+  incomparable - the motivations are different. What about transducers
+  with regular look ahead? 
+
+\item Reachability of mDSAs: algorithm and a potential encoding in
+  SAT?
+  
+\item EDTs to mDSAs: formal semantics for EDTs as mDSA. 
+
+\item Test generation algorithm for EDTs reduced reachability in
+  mDSAs. Complexity of test generation. 
+
+\item Can we encode the test generation procedure as a SAT solving
+  algorithm, instead of explicitly constructing the EDT and then
+  running a reachability algorithm? This SAT-based solution should
+  take an EDT and spit out a bunch of SAT queries, to cover each
+  row. This also allows us to ask for ``bounded'' test case
+  generation. 
+
+\item Experiments. Give arguments to show that situation is better
+  than before. Independently, is mDSA useful in a different
+  setting. Potentially a new case study that illustrates the use of
+  EDT methodology in a new setting.  
+  
+\end{itemize}
+
 \bibliographystyle{plain}
 \bibliography{dsa}
 
