@@ -102,11 +102,11 @@ different ordering between letters from different ports.%
 \paragraph*{Semantics} $B=\langle B_1,B_2,\dots,B_{k'} \rangle$ is a tuple of tapes, one for each port and some additional ones ($k'\ge k$). Each tape has two tape heads, $L$ and $R$, that track the previous `match' and latest input respectively. 
 
 \begin{enumerate}
-\item All tapes are initialized at position 0, with the $L$ and $R$ heads both pointing there. (call the head positions for tape $B_i$, $L_i$ and $R_i$)
+\item All tapes are initialized at position 0, with the $L$ and $R$ heads both pointing there. (call the head positions for the $B_i$ tape, $L_i$ and $R_i$)
 
 \item When an input $a \in \Sigma_i$ is seen, the tape $B_i$ has its $R$-head move right by one position and store the value $a$. ($R_i := R_i+1$)
 
-\item A transition is \emph{matched} if every $B_i$ has $u_i$ as a suffix of its stored word, and at least one $B_i$ has $R_i-L_i>0$ . %removed condition for R-head to move (VERIFY!)
+\item A transition is \emph{matched} if every $B_i$ has $u_i$ as a suffix of its stored word, with either $L_i=R_i$ or the entire $u_i$ present between $L_i$ and $R_i$. Additionally, at least one $B_i$ has $R_i-L_i>0$.
 
 \item A matched transition is then \emph{triggered}, that is $\forall u_i \ne \epsilon$, the $L$-head of $B_i$ moves to the position of its $R$-head. ($L_i := R_i$)
 \end{enumerate}
@@ -116,9 +116,9 @@ The states of a multi-port DSA are defined as per the requirements of the system
 Transitions must then be enhanced in our semantics i.e.  a transition $(q, (u_1, \dots, u_k), q')$ can now require the local variables $S_1, S_2,\dots$ to have values $(s_1, s_2 \dots)$  for it to match. When triggered, the values then change to $(s'_1,s'_2,\dots)$. Assume each variable $S_i$ has its corresponding tape labeled $B_{S_i}$ (we relabel the tapes $B_{k+1}, B_{k+2}, \dots, B_{k'}$ appropriately). Let us use the syntax $\langle (q, (u_1, \dots, u_k), q') , (s_1, s_2 \dots), (s'_1,s'_2,\dots) \rangle$ to represent this.
 
 \begin{enumerate}
-\item A transition $\langle (q, (u_1, \dots, u_k), q') , (s_1, s_2 \dots), (s'_1,s'_2,\dots) \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of each $B_{S_i}$ is $s_i$, and $R_i-L_i>0$ for at least one tape.
+\item A transition $\langle (q, (u_1, \dots, u_k), q') , (s_1, s_2 \dots), (s'_1,s'_2,\dots) \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of each $B_{S_i}$ is $s_i$, and either $L_i=R_i$ or the entire $u_i$ present between $L_i$ and $R_i$. Additionally, at least one tape is non-empty between its $L$ and $R$ heads.
 
-\item A matched transition is then triggered, moving  the $L$-head of $B_i$ to the position of its $R$-head $\forall u_i \ne \epsilon$ and $\forall s_i \ne \epsilon$. Additionally $\forall s'_i \ne \epsilon$, the corresponding $B_{S_i}$ moves its $R$-head by one position to the right and stores $s'_i$.
+\item A matched transition is then triggered, moving  the $L$-head of $B_i$ (or $B_{S_i}$) to the position of its $R$-head $\forall u_i \ne \epsilon$ and $\forall s_i \ne \epsilon$. Additionally $\forall s'_i \ne \epsilon$, the corresponding $B_{S_i}$ moves its $R$-head by one position to the right and stores $s'_i$.
 \end{enumerate}
 
 % Given states $q, q'$, we say that a word $w \in \Sigma^*$ matches a
