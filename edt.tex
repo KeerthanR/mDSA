@@ -1,0 +1,85 @@
+\label{sec:edt}%
+
+\section{Expressive decision tables}
+Expressive Decision Tables (EDTs)~\cite{Venkatesh:DATE:2014} are a
+tabular notation for specifying software requirements and have been
+used in various industrial settings~\cite{Venkatesh:ENASE:2015}.  Systems are assumed to consist
+of some input variables, output variables and local variables (or
+states). The software requirements specify the
+behaviour of the outputs and local variables based on patterns
+in the inputs and local variables. Table~\ref{tab:edt-alarm} gives an example inspired from
+\cite{Venkatesh:ENASE:2015} which describes selected requirements of a
+car alarm module.
+
+\begin{table}[h!]
+  \centering \def\arraystretch{1.2}
+  \caption{EDT for an Alarm module}
+  \label{tab:edt-alarm}
+  \begin{tabular}{|c|c|c|c||c|c|}
+    \hline
+    sno & \specialcell{in \\ Ignition} &
+                                         \specialcell{in \\ PanicSw} &
+                                                                       \specialcell{in 
+    \\ Alarm} & \specialcell{out \\ Alarm} & 
+                                             \specialcell{out \\ Flash} \\
+    \hline 
+    1 & Off & (Press; Press)\{$<3$s\} & Off & On &
+    \\
+    \hline
+    2 & & Press\{$>3$s\} & On & Off & False \\
+    \hline
+    3 & On & & & Off & False \\
+    \hline
+  \end{tabular}
+  
+\end{table}
+An EDT can be seen as being divided into two sides - the input side
+and the output side. Column headers on the input side describe the
+input and local variables, and are prefixed with \emph{in}. Similarly,
+column headers on the output side describe the local and output
+variables, and are prefixed by \emph{out}. Local variables occur on
+both sides. In Table~\ref{tab:edt-alarm}, note that the variable
+\emph{Alarm} appears on both the sides, making it a local
+variable. Each row gives a system requirement. The EDT of
+Table~\ref{tab:edt-alarm} gives a concise representation of the
+following requirements:
+\begin{enumerate}
+\item If \emph{Ignition} and \emph{Alarm} are \emph{Off}, and
+  \emph{PanicSw} is pressed twice within $3$ seconds, then
+  \emph{Alarm} should be turned \emph{On}.
+
+\item If it is more than $3$ seconds since the \emph{PanicSw} is
+  pressed, and the \emph{Alarm} is \emph{On}, then \emph{Flash}
+  should be \emph{False} and \emph{Alarm} should be turned \emph{Off}.
+
+\item If \emph{Ignition} becomes \emph{On}, then \emph{Flash} should
+  be \emph{False} and \emph{Alarm} should be \emph{Off}.
+\end{enumerate}
+
+A test case for a requirement is a sequence of inputs that triggers
+the particular requirement. EDTs have been successfully applied to
+generate test cases for software requirements --- thanks to the simple
+syntax, system engineers are comfortable in translating a large set of
+requirements into EDTs and algorithms for generating test cases have
+been studied and shown to be more effective than manual
+testing~\cite{Venkatesh:ENASE:2015}. However, the notation lacks a
+rigorous formal semantics, except for a brief description of key
+elements of formal semantics in~\cite{Venkatesh:DATE:2014}. Current
+test generation algorithms are based on this intuitive understanding
+of the language, and apply heuristics to cover as many requirements as
+possible. 
+%When certain requirements do not get covered, a manual 
+% As we will show in this paper, the mechanics of
+%EDTs is intricate due to various interactions between the rows. An
+%automated tool to generate test cases or \emph{guarantee}
+%non-coverability is indispensable. To achieve this, the first step is
+%to have a formal operational semantics for EDT.
+
+
+%\input{basic.tex}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "mDSA"
+%%% End:
