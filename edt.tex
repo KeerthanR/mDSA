@@ -75,6 +75,37 @@ possible.
 %non-coverability is indispensable. To achieve this, the first step is
 %to have a formal operational semantics for EDT.
 
+\subsection{Translating EDT to mDSA}
+
+We give a semantics for EDT, restricted to being without timing, via mDSAs. 
+\begin{itemize}
+\item
+Every EDT has a corresponding mDSA with one state.
+\item
+The alphabets of all the ports together make a multi-port alphabet for the mDSA
+\item
+Each port has a corresponding tape. Each row has a tape head in each tape, corresponding to itself.
+\item
+Every row becomes a transition label of the same form, looping back into the state.
+\item
+The mDSA described above then captures the behaviour of the EDT
+\end{itemize}
+
+The mDSA above is a succinct representation of the EDT semantics. The states of a multi-port DSA are defined as per the requirements of the system it models. For a system with internal variables $S_1,S_2,\dots$ with each variable $S_i$ having an alphabet $\Sigma_{S_i}$, the corresponding \mdsa has states $Q=\Sigma_{S_1} \times \Sigma_{S_2} \times \dots$, but as seen earlier, this can be captured using additional tape instead. The additional tapes $B_{S_1}, B_{S_2}, \dots$ are for the internal variables used in the system. These variables can read input as well as produce output, over the alphabet representing their state space. %For example, a variable $S_i$ has an alphabet $\Sigma_{S_i}$ with letters that can be input as well as output.
+
+Transitions must then be enhanced in our semantics i.e. a transition can now require the local variables $S_1, S_2,\dots$ to have values $(s_1, s_2 \dots)$  for it to match. When triggered, the values then change to $(s'_1,s'_2,\dots)$. Assume each variable $S_i$ has its corresponding tape labeled $B_{S_i}$%(we relabel the tapes $B_{k+1}, B_{k+2}, \dots, B_{k'}$ appropriately)
+. Let us use the syntax $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots) \rangle$ to represent this.
+
+\begin{enumerate}
+\item A transition (with label $j$) $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots) \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of each $B_{S_i}$ is $s_i$, and either $H_{i}^{j}$ is at the end or the entire $u_i$ is after $H_{i}^{j}$. Additionally, at least one tape is non-empty after $H_{i}^{j}$.
+
+\item A matched transition is then triggered, moving each $H_{i}^{j}$-head of $B_i$ (or $B_{S_i}$) to the end. Additionally $\forall s'_i \ne \epsilon$, the corresponding $B_{S_i}$ extends by one position to the right and stores $s'_i$.
+\end{enumerate}
+
+\textcolor{red}{Semantics for Row sequences}
+We introduce the notion of a multi-transition, a transition with multiple parts that must occur in sequence. Let us illustrate with a two-part transition $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots)$ ; $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k), (s'''_1,s'''_2,\dots) \rangle$. For it to match, each $B_i (i\le k)$ must have $u_i  u'_i$ as suffix, each $B_{S_i}$ has $s_i  s''_i$, and either $H_{i}^{j}$ is at the end or the entire $u'_i$ occurs after $H_i^j$. Additionally, at least one tape is non-empty after $H_i^j$ heads. Not only this, all of $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k)$ must occur after $(s_1, s_2 \dots), (u_1, \dots, u_k)$. That is each for any $i,j$ we have $u'_i$ and $s''_i$ appearing after $u_j$ and $s_j$. When the matched transition is triggered, the tapes and their head positions are updated as earlier.
+
+\textcolor{red}{TODO: Reachability for mDSA vs Test generation for EDT. Complexity result (possibly PSPACE-complete)}
 
 %\input{basic.tex}
 

@@ -99,7 +99,7 @@ different ordering between letters from different ports.%
 % \parallel \epsilon$. So, we need a completely fresh analysis for extending
 % the parallel operation to DSA. We could keep this for future work.}%
 
-\paragraph*{Semantics} $B=\langle B_1,B_2,\dots,B_{k'} \rangle$ is a tuple of tapes, one for each port and some additional ones ($k'\ge k$). Each tape has several tape heads, one for each unique transition label (corresponding to a `system requirement'), that track the previous `match' for each such requirement. 
+\paragraph*{Semantics} $B=\langle B_1,B_2,\dots,B_{k} \rangle$ is a tuple of tapes, one for each port. Each tape has several tape heads, one for each unique transition label (corresponding to a `system requirement'), that track the previous `match' for each such requirement. 
 
 \begin{enumerate}
 \item All tapes are initially empty, with all the tape heads at zero. (call the head positions for the $B_i$ tape tracking transition label $j$, $H_{i}^{j}$)
@@ -108,18 +108,19 @@ different ordering between letters from different ports.%
 
 \item A transition $(q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ with label $j$ (that is $u_1 \parallel u_2 \parallel \cdots \parallel u_k$) is \emph{matched} if every $B_i$ has $u_i$ as a suffix of its stored word, with either $H_{i}^{j}$ at the end of the tape or the entire $u_i$ present after $H_{i}^{j}$. Additionally, at least one $B_i$ has $H_{i}^{j}$ not at the end of the tape.
 
-\item A matched transition is then \emph{triggered}, that is $\forall u_i \ne \epsilon$, the $H_{i}^{j}$ moves to the end. 
+\item A matched transition is then \emph{triggered} and $\forall i, H_{i}^{j}$ moves to the end. 
 \end{enumerate}
 
-The states of a multi-port DSA are defined as per the requirements of the system it models. For a system with internal variables $S_1,S_2,\dots$ with each variable $S_i$ having an alphabet $\Sigma_{S_i}$, the corresponding \mdsa has states $Q=\Sigma_1 \times \Sigma_2 \times \dots$. The additional tapes $B_{k+1}, B_{k+2}, \dots, B_{k'}$ are for the internal variables used in the system. These variables can read input as well as produce output, over the common alphabet representing their state space. %For example, a variable $S_i$ has an alphabet $\Sigma_{S_i}$ with letters that can be input as well as output.
-
-Transitions must then be enhanced in our semantics i.e.  a transition $(q, (u_1, \dots, u_k), q')$ can now require the local variables $S_1, S_2,\dots$ to have values $(s_1, s_2 \dots)$  for it to match. When triggered, the values then change to $(s'_1,s'_2,\dots)$. Assume each variable $S_i$ has its corresponding tape labeled $B_{S_i}$ (we relabel the tapes $B_{k+1}, B_{k+2}, \dots, B_{k'}$ appropriately). Let us use the syntax $\langle (q, (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots), q') \rangle$ to represent this.
+Note that the state of the mDSA can be recorded in an additional tape, which can read the current state and write its value. With an alphabet consisting of the the set of states $Q$, this tape (call it $B_S$) can effectively replicate the change of state on triggering a transitions
 
 \begin{enumerate}
-\item A transition (with label $j$) $\langle (q, (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots), q') \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of each $B_{S_i}$ is $s_i$, and either $H_{i}^{j}$ is at the end or the entire $u_i$ is after $H_{i}^{j}$. Additionally, at least one tape is non-empty after $H_{i}^{j}$.
+\item Initiate tape $B_S$ with value $q_i$
 
-\item A matched transition is then triggered, moving each $H_{i}^{j}$-head of $B_i$ (or $B_{S_i}$) to the end $\forall u_i \ne \epsilon$ and $\forall s_i \ne \epsilon$. Additionally $\forall s'_i \ne \epsilon$, the corresponding $B_{S_i}$ extends by one position to the right and stores $s'_i$.
+\item A transition (with label $j$) $\langle (q, (u_1, \dots, u_k), q') \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of $B_{S}$ is $q$, and either $H_{i}^{j}$ is at the end or the entire $u_i$ is after $H_{i}^{j}$. Additionally, at least one tape is non-empty after $H_{i}^{j}$.
+
+\item A matched transition is then triggered, moving each $H_{i}^{j}$-head of $B_i$ to the end. Additionally $B_{S}$ extends by one position to the right and stores $q'$.
 \end{enumerate}
+
 
 % Given states $q, q'$, we say that a word $w \in \Sigma^*$ matches a
 % transition $(q, (u_1, \dots, u_k), q')$ at $q$ if
@@ -128,6 +129,8 @@ Transitions must then be enhanced in our semantics i.e.  a transition $(q, (u_1,
 % $\theta = (q, (u_1, \dots, u_k), q')$ is \emph{triggered} if $w$
 % matches $\theta$ at $q$, and moreover, no proper prefix of $w$
 % matches any outgoing transition at $q$.
+
+\textcolor{red}{TODO: Lemma for equivalence between mDSA with states and mDSA with r/w tape}
 
  For a word $w \in \Sigma^*$, the run of \mdsa $\Aa$ on $w$ is given by:
  \begin{align*}
@@ -143,9 +146,6 @@ Transitions must then be enhanced in our semantics i.e.  a transition $(q, (u_1,
  deterministic suffix-reading automata to the multi-port
  case. %Henceforth we will write mDSA for multi-port DSA.%
 
-\textcolor{red}{Semantics for Row sequences}
-We introduce the notion of a multi-transition, a transition with multiple parts that must occur in sequence. Let us illustrate with a two-part transition $\langle (q, (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots); (s''_1, s''_2 \dots), (u'_1, \dots, u'_k), (s'''_1,s'''_2,\dots) q') \rangle$. For it to matched, each $B_i (i\le k)$ must have $u_i  u'_i$ as suffix, each $B_{S_i}$ has $s_i  s''_i$, and either $H_{i}^{j}$ is at the end or the entire $u'_i$ occurs after $H_i^j$. Additionally, at least one tape is non-empty after $H_i^j$ heads. Not only this, all of $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k)$ must occur after $(s_1, s_2 \dots), (u_1, \dots, u_k)$. That is each for any $i,j$ we have $u'_i$ and $s''_i$ appearing after $u_j$ and $s_j$. When the matched transition is triggered, the tapes and their head positions are updated as earlier.
-
 \begin{lemma}
  A multi-port DSA has a unique run over every word.
 \end{lemma}%
@@ -155,7 +155,10 @@ We introduce the notion of a multi-transition, a transition with multiple parts 
  a multi-port DSA $S_M$ such that $\Ll(M) = \Ll(S_M)$, and
  vice-versa.
 \end{theorem}
-\begin{IEEEproof} (Sketch.) For DFA to \mdsa: first complete the DFA, and
+
+\textcolor{red}{TODO: Fix proof. May need to synchronize tape heads}
+
+\begin{proof} (Sketch.) For DFA to \mdsa: first complete the DFA, and
  then replace $q \xra{a} q'$ with
  $q \xra{(\e, \e, \dots, a, \dots, \e)} q'$ putting $a$ at the right
  port.%
@@ -165,9 +168,10 @@ We introduce the notion of a multi-transition, a transition with multiple parts 
  $\partial w = (u_1, \dots, u_k)$. This gives a DSA. From previous
  result that DSA can be converted to DFA, we get DFA.%
 
-\end{IEEEproof}%
 
+\end{proof}%
 
+\textcolor{red}{TODO: Complexity of membership for mDSA. Mostly linear with some pre-processing for string matching}
 
 
 
