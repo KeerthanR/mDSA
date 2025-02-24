@@ -1,0 +1,82 @@
+\documentclass[runningheads,envcountsame]{llncs}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan
+    }
+
+\usepackage{lineno}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{thmtools}
+\usepackage{thm-restate}
+
+\title{An automaton model to succinctly represent suffix-based specifications of a distributed system}
+
+\titlerunning{An automaton model to succinctly represent suffix-based specifications of a distributed system}
+
+\author{R Keerthan\inst{1,2} \and B Srivathsan\inst{2,3} \and
+  R Venkatesh\inst{1}}
+
+  \institute{Tata Consultancy Services - Innovation Labs, Pune \\
+   \email{keerthanr@tcs.com, r.venky@tcs.com} \and Chennai Mathematical Institute,
+  India \\
+  \email{sri@cmi.ac.in} \and CNRS, ReLaX,
+  IRL 2000, Siruseri, India }
+
+  \begin{document}
+  
+  \maketitle
+
+  \begin{abstract}
+    Expressive Decision Table (EDT) is a formal notation developed by Venkatesh et al. (2014) for specifying requirements of a distributed reactive system. %The requirements typically check if a given stream of events last appeared in each component (in other words, a good suffix appears in each component), based on which specific outputs are generated. 
+    EDTs have been successfully deployed in various industrial settings and several test generation tools for EDT specifications have been developed. However,  arguably, due to a complex interplay between concurrency and suffix-based event triggers, the EDT notation lacks a rigorous operational semantics. As a result, none of the test generation methods guarantees coverage completeness. When there is only a single component in the system (so, no concurrency), suffix-based event triggers can be conveniently captured using the recently introduced Deterministic Suffix-Reading Automata (DSA). %Being an automaton model, DSAs come equipped with precise operational semantics.
+    %Recently, Deterministic Suffix-reading Automata (DSA) have been introduced to succinctly capture suffix-based specifications. % Transitions of a DSA are labeled with words -- intuitively, a transition is triggered at a state as soon as a stream of events ending with the label is seen. 
+
+    In this work, we enrich DSAs to \emph{multi-port DSAs} --- a new automaton model which can succinctly represent \emph{concurrent} suffix-based specifications. %More specifically, we enrich transition labels to include a $\parallel$ operator. 
+    %We call the resulting automata as \emph{multi-port DSAs}. 
+    We describe a formal operational semantics for multi-port DSAs and show that EDTs are simply a subclass of multi-port DSAs. Consequently, test generation for EDTs naturally reduces to emptiness checking in multi-port DSAs. Finally, we prove that emptiness of multi-port DSAs is PSPACE-complete.
+  \end{abstract}
+
+  %Specifying requirements of a reactive system in a precise notation is an all important step before any kind of formal verification. The notation should be easy to use and also rigorous enough to enable automated analysis methods. 
+
+  \section{Introduction}
+
+  Why easy-to-write specifications are important? Why formal semantics is important? 
+  
+  EDT introduction. Some examples of EDTs. 
+
+  An intricate EDT example for which no current tool can generate a test case? 
+
+  Contributions
+
+  2 to 3 pages
+
+  \section{Preliminaries}
+
+  Formal syntax, semantics and examples of DSA (2 pages)
+
+  \section{Multi-port DSA}
+
+  Multi-port alphabet, the new rules, automaton over these new rules, examples and operational semantics (3 pages)
+
+  How multi-port DSA extends EDT and DSA (1 page)
+
+  EDT Test generation as emptiness + explanation on the intricate example (1 page)
+
+  \section{Complexity of emptiness}
+
+  PSPACE upper bound (2 pages)
+
+  PSPACE lower bound (2 pages)
+
+  \section{Experiments? and Conclusion}
+
+  \end{document}
