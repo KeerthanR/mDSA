@@ -1,29 +1,29 @@
-%\documentclass[a4paper, 11pt]{llncs}
+\documentclass[a4paper, 11pt]{llncs}
 
-\documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
+%\documentclass[conference]{IEEEtran}
+%\IEEEoverridecommandlockouts
 
 \usepackage{amsmath,amssymb}
 \usepackage{stmaryrd}
 \usepackage{tikz}
 \usepackage{url}
-\ifCLASSOPTIONcompsoc
+%\ifCLASSOPTIONcompsoc
 % requires cite.sty v4.0 or later (November 2003)
-\usepackage[nocompress]{cite}
-\else
-\usepackage{cite}
-\fi
+%\usepackage[nocompress]{cite}
+%\else
+%\usepackage{cite}
+%\fi
 
 %% Macros
 
 % Greek
-\newtheorem{definition}{Definition}
+%\newtheorem{definition}{Definition}
 
-\newtheorem{example}{Example}
-\newtheorem{lemma}{Lemma}
-\newtheorem{corollary}{Corollary}
+%\newtheorem{example}{Example}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{corollary}{Corollary}
 %\newtheorem{proof}{IEEEproof}
-\newtheorem{theorem}{Theorem}
+%\newtheorem{theorem}{Theorem}
 
 \renewcommand{\a}{\alpha}
 \renewcommand{\b}{\beta}
@@ -69,8 +69,9 @@
 \newcommand{\spm}{\sp^{\mathsf{m}}}
 \newcommand{\sfxm}{\sfx^{\mathsf{m}}}
 \newcommand{\psfxm}{\psfx^{\mathsf{m}}}
-\renewcommand{\IEEEQED}{\IEEEQEDopen}
+%\renewcommand{\IEEEQED}{\IEEEQEDopen}
 
+\newcommand{\PSPACE}{\operatorname{\textsc{Pspace}}}
 \newcommand{\NP}{\mathsf{NP}}
 \newcommand{\coNP}{\mathsf{coNP}}
 \newcommand{\vertex}{\textsc{VertexCover}~}
@@ -86,12 +87,66 @@
 \renewcommand{\e}{\varepsilon}
 \renewcommand{\epsilon}{\e}
 
+\newcommand{\Tt}{\mathcal{T}}
+\newcommand{\Ii}{\mathcal{I}}
+\newcommand{\Vv}{\mathcal{V}}
+%\input{macros}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\var}{\operatorname{Var}}
+\newcommand{\dom}{\ensuremath{dom}}
+
 \begin{document}
 \title{Suffix-reading automata in a practical setting}
 
 \maketitle
 
 \input{definition.tex}
+
+\input{edt.tex}
+
+\section{Test generation}
+\label{sec:test-generation}
+
+% What is test generation? The decision problem
+Given an EDT $\Tt$ and a row $R$ of $\Tt$ as input, the \emph{test
+  generation problem} is to decide if there exists an execution
+$\pi \in \Ll(\Tt)$ such that $R$ is triggered in $\pi$.
+%
+The problem is
+intrinsically difficult: one might have to match an intermediate row
+multiple times in order to generate a test case for $R$, in fact this
+number could even be exponential. This is witnessed in the EDT that
+implements an $n$ bit counter. In order to match a row with $n$ ones,
+the row with $0$ followed by $(n-1)$ $1$ needs be matched $2^{n-1}$
+times. 
+%
+But thanks to the semantics of EDTs as Mealy machines, a natural
+algorithm for this problem is to compute the Mealy machine 
+on the fly and detect whether the row is triggered by a simple
+traversal of the machine.
+
+
+\begin{theorem}
+  \label{thm:test-generation-PSPACE}
+  Test generation for EDTs is $\PSPACE$-complete.
+\end{theorem}
+
+We prove below that test generation is $\PSPACE$-complete
+
+For an EDT, its mDSA has exponentially many
+configurations of tapes. But each configuration requires polynomially many bits (the tapes themselves). Detecting a test
+case amounts to non-deterministically guessing a sequence of configurations. By standard complexity arguments, this gives a
+$\PSPACE$-upper bound. %As we saw, all other EDTs can be converted in polynomial time to basic EDTs.
+
+For the hardness, we reduce the problem of DFA
+intersection. Consider $n$ DFA $\Aa_1, \Aa_2, \dots, \Aa_n$. The
+problem is to decide if their intersection is empty. Each $\Aa_i$
+can be considered as an EDT with row sequences. Assume that the sets
+of states are mutually disjoint. Add a binary local variable $l_i$ and rules
+such that $l_i = 1$ if ``current'' state of $\Aa_i$ is accepting and
+otherwise $l_i = 0$. Add a row $\Land_i l_i = 1 \imp U$ for some
+update. This row matches iff there is a non-empty intersection.
 
 \section{Todos.}
 
@@ -127,7 +182,7 @@
   
 \end{itemize}
 
-\bibliographystyle{plain}
-\bibliography{dsa}
+\bibliographystyle{splncs04}
+\bibliography{mDSA}
 
 \end{document}	
