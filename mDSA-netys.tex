@@ -20,7 +20,7 @@
 
 \title{An automaton model to succinctly represent suffix-based specifications of a distributed system}
 
-\titlerunning{An automaton model to succinctly represent suffix-based specifications of a distributed system}
+\titlerunning{An automaton model for suffix-based specifications of a distributed system}
 
 \author{R Keerthan\inst{1,2} \and B Srivathsan\inst{2,3} \and
   R Venkatesh\inst{1}}
@@ -31,48 +31,161 @@
   \email{sri@cmi.ac.in} \and CNRS, ReLaX,
   IRL 2000, Siruseri, India }
 
+
+  %% Macros
+
+  \newcommand{\xra}{\xrightarrow}
+
   \begin{document}
   
   \maketitle
 
   \begin{abstract}
-  Deterministic Suffix-reading Automata (DSA) were introduced recently as a more concise model for regular languages. %Each transition of a DSA is labeled by a word. A DSA waits in a state, listening to inputs, until one of the labels in an outgoing transition appears as a suffix of the input stream. When this happens, the corresponding transition is fired and the DSA moves to a new state. 
-  DSAs can concisely capture formal specifications that are based on \emph{sequences} of input actions (and not just single actions). For a distributed system, specifications may further depend on combinations of input sequences seen across multiple components (ports). %DSAs are not equipped to reason about such concurrency in an elegant manner. 
+  Deterministic Suffix-reading Automata (DSA) were introduced recently as a  concise model for regular languages. 
+  DSAs can succinctly capture formal specifications that are based on \emph{sequences} of input actions (and not just single actions). For a distributed system, specifications may further depend on combinations of input sequences seen across multiple components (ports). 
   For such systems, DSAs consider all possible interleavings, resulting in large and unreadable automata.
 
   In this work, we enrich DSAs to include a $\parallel$ operator in its transitions. The resulting \emph{multi-port DSAs (mDSAs)} can succinctly represent concurrent suffix-based specifications. We provide a formal operational semantics for mDSAs and prove that emptiness for mDSAs is PSPACE-complete. 
-  We then apply our results to the analysis of Expressive Decision Tables (EDTs) -- an industry notation for specifying requirements of reactive systems. The EDT notation has been successfully deployed in various industrial settings. However, arguably, due to a complex interplay between concurrency and suffix-based conditions, the notation lacks a rigorous operational semantics. As a result, existing test generation algorithms for EDTs do not give any theoretical guarantees. Here, we provide formal operational semantics for a fragment of the EDT notation using mDSAs, and reduce EDT-test-generation to mDSA-emptiness.
+  Then, we apply our results to the analysis of Expressive Decision Tables (EDTs) -- an industry notation for specifying requirements of reactive systems. The EDT notation has been successfully deployed in various industrial settings. However, arguably, due to a complex interplay between concurrency and suffix-based conditions, the notation lacks a rigorous operational semantics. As a result, existing test generation algorithms for EDTs do not give any theoretical guarantees. Here, we provide formal operational semantics for a fragment of the EDT notation using mDSAs, and reduce EDT-test-generation to mDSA-emptiness.
   
-  %EDTs have been successfully deployed in various industrial settings and several test generation tools for EDT specifications have been developed. However,  arguably, due to a complex interplay between concurrency and suffix-based event triggers, the EDT notation lacks a rigorous operational semantics. As a result, none of the test generation methods provides theoretical guarantees. We fill this gap here for a fragment of EDT: we provide formal operational semantics using mDSAs and reduce the test generation problem for the EDT fragment to emptiness of mDSAs.
-  
-  %that has been successfully deployed in various industrial setting. As an application, we present a formal semantics for a fragment of a specification formalism called Expressive Decision Tables (EDTs), using multi-port DSAs and reduce the test generation problem for EDTs to emptiness of multi-port DSAs. The EDT notation has been successfully deployed in an industrial setting to specify requirements and generate tests, but the notation lacks a formal operational semantics and the test generation algorithms do not give theoretical guarantees. We fill this gap here for a restricted fragment of the notation, using multi-port DSAs. 
   \end{abstract}
-  % \begin{abstract}
-  %   Expressive Decision Table (EDT) is a formal notation developed by Venkatesh et al. (2014) for specifying requirements of a distributed reactive system. %The requirements typically check if a given stream of events last appeared in each component (in other words, a good suffix appears in each component), based on which specific outputs are generated. 
-  %   EDTs have been successfully deployed in various industrial settings and several test generation tools for EDT specifications have been developed. However,  arguably, due to a complex interplay between concurrency and suffix-based event triggers, the EDT notation lacks a rigorous operational semantics. As a result, none of the test generation methods guarantees coverage completeness. When there is only a single component in the system (so, no concurrency), suffix-based event triggers can be conveniently captured using the recently introduced Deterministic Suffix-Reading Automata (DSA). %Being an automaton model, DSAs come equipped with precise operational semantics.
-  %   %Recently, Deterministic Suffix-reading Automata (DSA) have been introduced to succinctly capture suffix-based specifications. % Transitions of a DSA are labeled with words -- intuitively, a transition is triggered at a state as soon as a stream of events ending with the label is seen. 
-
-  %   In this work, we enrich DSAs to \emph{multi-port DSAs} --- a new automaton model which can succinctly represent \emph{concurrent} suffix-based specifications. %More specifically, we enrich transition labels to include a $\parallel$ operator. 
-  %   %We call the resulting automata as \emph{multi-port DSAs}. 
-  %   We describe a formal operational semantics for multi-port DSAs and show that EDTs are simply a subclass of multi-port DSAs. Consequently, test generation for EDTs naturally reduces to emptiness checking in multi-port DSAs. Finally, we prove that emptiness of multi-port DSAs is PSPACE-complete.
-  % \end{abstract}
-
-  % We start with DSAs. Cannot handle concurrency well. We extend it here. As an application we give formal semantics to EDTs. Test generation algos have no theoretical guarantees. Now we give operational semantics.
-
-
-  %Specifying requirements of a reactive system in a precise notation is an all important step before any kind of formal verification. The notation should be easy to use and also rigorous enough to enable automated analysis methods. 
-
+  
   \section{Introduction}
 
-  Why easy-to-write specifications are important? Why formal semantics is important? 
+  % Automata are very useful. In particular in formal verification and model-based testing.
+
+  Finite state automata are all-pervasive, adopting different roles in different contexts. In this work, we focus on the role of automata as \emph{formal models of system requirements} and their subsequent application in Model Based Testing (MBT). MBT is a paradigm in formal methods where the requirements of a system under test (SUT) are first converted to a formal model. This formal model is then used to automatically generate test cases for the SUT. There are many MBT tools (see \cite{10.1145/1353673.1353681,10.1002/stvr.456} for a survey) and in several of them, the formal model is given by some extension of finite automata. 
+
+  %Automata can be made concise.Making automata concise is a long line of work. Different ways in which they could be made concise. In MBT this helps in writing more concise specifications. 
+
+  Converting requirements to a Deterministic Finite Automaton (DFA) or a Non-deterministic Finite Automaton (NFA) is often cumbersome. This is because DFAs and NFAs describe low level computations which reason about individual actions. There are various ways in which automata can be made consise. In Generalized Automata~\cite{DBLP:books/lib/Eilenberg76,GIAMMARRESI1999191}, transitions contain words instead of single actions. A transition $q \xra{abb} q'$ is fired from $q$ if the word $abb$ is after the automaton reaches $q$. Therefore requirements which depend on an exact sequence of actions can be represented using generalized automata more concisely. A natural extension is to allow for regular expressions in transitions, resulting in the model of Expression Automata~\cite{10.1007/978-3-540-30500-2_15} and its deterministic variant. Deterministic Expression Automata (DEA) impose restrictions on the regular expressions that can be used: they should result in a prefix-free language, and moreover, every pair of regular expressions out of state is language disjoint. This results in DEA recognizing a subset of regular languages. On the other hand, in Expression Automata, the transitions are so powerful that the states have almost no meaning: the entire automaton can be reduced to a single state and a single transition labeled by the regular expression representing the language. For languages leading to big automata, the corresponding regular expression can be complicated and incomprehensible. The goal is to hit a sweet spot where the transition labels are not too complicated, and at the same time there are fewer states than a DFA. 
+
+   
+
+  Deterministic suffix-reading automata (DSAs)~\cite{DBLP:journals/corr/abs-2410-22761} are a recently introduced automaton model for regular languages. Transitions are  labeled with words (as in a generalized automaton), however, the semantics is different. A transition $q \xra{abb} q'$ is fired from $q$ if a word \emph{ending} with the suffix $abb$ is seen. When there are multiple transitions out of a state, the first transition that matches is fired. Figure~\ref{fig:dsa-examples} gives some examples of DSAs.
+
+  \begin{figure}
+  \centering
+  \begin{tikzpicture}[state/.style={circle, inner sep=2pt, draw, thick}]
+    \begin{scope}[every node/.style={state}]
+      \node [double] (0) at (0,0) {\scriptsize $q_0$};
+    \end{scope}
+    \begin{scope}[->, >=stealth, thick]
+      \draw (-0.5, 0) to (0);
+      \draw (0) to [loop above] node {\scriptsize $ab$} (0);
+    \end{scope}
+    \node at (0, -0.7) {\scriptsize $(a)$};
+
+    \begin{scope}[xshift=2cm]
+      \begin{scope}[every node/.style={state}]
+        \node (0) at (0,0) {\scriptsize $q_0$};
+        \node [double] (1) at (1.5, 0) {\scriptsize $q_1$};
+      \end{scope}
+      \begin{scope}[->, >=stealth, thick]
+        \draw (-0.5, 0) to (0);
+        \draw (0) to [loop above] node  {\scriptsize $ba$} (0);
+        \draw (0) to node [above] {\scriptsize $ab$} (1);
+      \end{scope}
+      \node at (0.54, -0.7) {\scriptsize $(b)$};
+    \end{scope}
+
+      \begin{scope}[xshift=6cm]
+        \begin{scope}
+          \node [rectangle, rounded corners, draw, inner sep=3pt, thick] (0) at (0,0) {\scriptsize \texttt{Alarm=Off}};
+          \node [rectangle, rounded corners, draw, inner sep=3pt, thick] (1) at (0,1.5) {\scriptsize \texttt{Alarm=On}};
+          \node [rectangle, rounded corners, draw, inner sep=3pt, thick, double] (2) at (4, 0) {\scriptsize \texttt{Error}};
+        \end{scope}
+
+        \begin{scope}[->, >=stealth, thick]
+          \draw (-1,0) to (0);
+          \draw (0) to [bend left] node [left] {\scriptsize \texttt{On}} (1);
+          \draw (1) to [bend left] node [right] {\scriptsize \texttt{Off}} (0);
+          \draw (0) to node [above] {\scriptsize \texttt{PanicSw;PanicSw}} (2);
+        \end{scope}
+        \node at (2, -0.7) {\scriptsize $(c)$};
+      \end{scope}
+    
+  \end{tikzpicture}
+  \caption{Examples of Deterministic Suffix-reading Automata (DSA)}
+  \label{fig:dsa-examples}
+  \end{figure}
+
+  In Figure~\ref{fig:dsa-examples}(a), the DSA accepts all words that end with $ab$, for instance $bab, bbab, babab$, etc. The transition $q_0 \xra{ab} q_0$ is fired as soon as a word ending with $ab$ is seen. In Figure~\ref{fig:dsa-examples}(a), we can view the state $q_0$ as tracking two suffixes $ba$ and $ab$. When $ba$ is seen before $ab$, the self-loop is triggered; otherwise when $ab$ is seen first, the transition to $q_1$ is taken. For example, on word $bbab$, the automaton starts at $q_0$, and on $bba$ it fires $q_0 \xra{ba} q_0$, reads $b$ and remains there. Since $q_0$ is non-accepting, the word is rejected. However, on $bbaab$, the run loops on $bba$ back to $q_0$, and then reads the next $ab$ to reach $q_1$, and accept. The final example Figure~\ref{fig:dsa-examples}(c) is a \emph{suffix-based specification} of a part of an automotive software: when the alarm is off, and the panic switch is pressed twice within one second, flag an error. Here, we assume there is a symbol \texttt{tick} to denote the elapse of $1$ unit of time. So, on a word \texttt{tick}; \texttt{On}; \texttt{tick} \texttt{Off}; \texttt{PanicSw}; \texttt{PanicSw}, an error should be flagged (we have added a separator symbol ; just for clarity). This specification is succinctly represented by the DSA in Figure~\ref{fig:dsa-examples}(c).
+
+   Since transitions in a DSA wait for specific patterns to appear, DSAs are able to represent suffix-based specifications succinctly. When we consider systems with multiple components (which we call ports), the requirements can talk about different combinations of inputs. Here are two examples. 
+
+   \begin{figure}
+   \centering
+   \begin{tikzpicture}
+      \begin{scope}[every node/.style={rectangle, rounded corners, draw, inner sep=3pt, thick}]
+        \node (0) at (0,0) {\scriptsize \texttt{Alarm=Off}};
+        \node (1) at (0,1.5) {\scriptsize \texttt{Alarm=On}};
+        \node (2) at (3.2,0) {\scriptsize \texttt{Car=Start}};
+      \end{scope}
+
+      \begin{scope}[->,>=stealth, thick]
+        \draw (-1,0) to (0);
+        \draw (0) to [bend left] node [left] {\scriptsize \texttt{On}} (1);
+        \draw (1) to [bend left] node [right] {\scriptsize \texttt{Off}} (0);
+        \draw (0) to node [above] {\scriptsize $K \parallel B \parallel P$} (2);
+      \end{scope}
+
+      \node at (1.5, -1.2) {\scriptsize $(a)$};
+
+      \begin{scope}[xshift=6cm]
+        \begin{scope}[every node/.style={rectangle, rounded corners, draw, inner sep=3pt, thick}]
+          \node (0) at (0,0) {\scriptsize \texttt{PhoneOff}};
+          \node (1) at (3,0) {\scriptsize \texttt{PhoneOn}};
+        \end{scope}
+
+        \begin{scope}[->,>=stealth, thick, auto]
+          \draw (-1,0) to (0);
+          \draw (0) to [bend left] node {\scriptsize $F \parallel T_1 T_2 T_3$} (1);
+          \draw (1) to [bend left] node {\scriptsize \texttt{Off}} (0);
+        \end{scope}
+
+        \node at (1.5, -1.2) {\scriptsize $(b)$};
+
+
+      \end{scope}
+   \end{tikzpicture}
+   \caption{Concurrent suffix-based specifications as multi-port DSAs}
+   \label{fig:mdsa-examples}
+   \end{figure}
+   \paragraph*{Car Security System.} For a car to start, you need: key in ignition ($K$), brake pedal pressed ($B$), transmission in park ($P$), and no alarm triggered. The actions $K$, $B$ and $P$ can occur in any order. A DSA would need to represent this requirement using all $6$ permutations. Instead, we assume an alphabet that is distributed across different \emph{ports} -- ignition, brake pedal, transmission, and denote the concurrent actions as $K \parallel B \parallel P$. Figure~\ref{fig:mdsa-examples}(a) illustrates the enriched DSA.
   
-  EDT introduction. Some examples of EDTs. 
+   \paragraph*{Smartphone Lock Pattern} To unlock a phone with pattern: fingerprint verification ($F$) and drawing specific gesture with three touch points ($T_1;T_2;T_3$). This is represented as $F \parallel (T_1 T_2 T_3)$ and the enriched DSA is shown in Figure~\ref{fig:mdsa-examples}(b).
+   
+  In Appendix~\ref{app:examples-of-parallel}, we give many more examples of similar situations that involve multiple ports and suffix-based requirements across all of them. To the best of our knowledge, no automaton model can represent such specifications succinctly. Incorporating concurrency into the specification is paramount when requirements talk about different components of the distributed system. 
+  
+  \subsubsection*{Contributions.} The goal of this paper is to investigate the addition of a $\parallel$ operator into the transition syntax of DSAs. We call the resulting model as \emph{multi-port DSAs}, where the alphabet is distributed (partitioned) across multiple ports. The challenge lies in describing an operational semantics that matches with our intentions. As our first technical contribution, we provide a formal operational semantics for multi-port DSAs. 
+  
+  We then show that state reachability (or emptiness) for mDSAs is PSPACE-complete. For the simpler models DFAs or DSAs, reachability is linear in the input size. The higher complexity for mDSAs ties with the intuition that mDSAs can be exponentially more succinct. Our proof of PSPACE-hardness indeed exhibits such an example. 
 
-  An intricate EDT example for which no current tool can generate a test case? 
+  As our next contribution, we apply the mDSA framework to provide a formal semantics for Expressive Decision Tables (EDTs), a notation introduced by \cite{DBLP:conf/date/VenkateshSKA14} to incorporate both state-based and stream-based requirements in one convenient tabular form. The EDT notation has been successfully deployed in many industrial projects. In \cite{DBLP:conf/date/VenkateshSKA14} it has also been observed that the time and effort involved in writing EDT specifications was considerably low compared to other formalisms like  Statecharts. Many test generation tools for EDT specifications have been developed: given an EDT, and a row, the tool can generate a sequence of input actions that can trigger the input-side conditions of the particular row~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}. %The tricky part in the EDT notation is the use of input-output (I/O) variables that make multiple rows dependent. 
+  Although EDTs have been used extensively for test generation, the notation does not yet have a formal operational semantics because of a complex interplay between concurrency and suffix-based rules. We close these gaps using the mDSA technology: we consider a fragment of the EDT notation, and map each EDT to an mDSA. This in turn gives an operational semantics for the EDT. Moreover, test generation for EDTs reduces to state reachability in mDSAs. 
+  
+  
+  
+  
 
-  Contributions
+  
 
-  2 to 3 pages
+  % Contributions. 
+  % - Add a parallel operator to the syntax. Examples 2 and 3. First time that both suffix-based and concurrency have been incorporated.
+  % - Challenge lies in describing an operational semantics that matches with our intentions.
+  % - State reachability of mDSAs (emptiness) is PSPACE-complete. Compare with DFAs/DSAs where it is polynomial-time. This ties with the intuition that mDSAs can be exponentially more succinct.
+  % - Application: EDT to mDSAs. Test generation for EDTs as emptiness of mDSAs.
+  
+  % Why easy-to-write specifications are important? Why formal semantics is important? 
+  
+  % EDT introduction. Some examples of EDTs. 
+
+  % An intricate EDT example for which no current tool can generate a test case? 
+
+  % Contributions
+
+  % 2 to 3 pages
 
   \section{Preliminaries}
 
@@ -93,6 +206,11 @@
   PSPACE lower bound (2 pages)
 
   \section{Experiments? and Conclusion}
+
+  \bibliographystyle{plain}
+  \bibliography{mDSA-netys.bib}
+
+  \appendix
 
   \input{examples.tex}
   \end{document}
