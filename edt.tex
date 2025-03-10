@@ -1,73 +1,71 @@
 \label{sec:edt}%
 
 \section{Expressive decision tables}
-Expressive Decision Tables (EDTs)~\cite{Venkatesh:DATE:2014} are a
-tabular notation for specifying software requirements and have been
-used in various industrial settings~\cite{Venkatesh:ENASE:2015}.  Systems are assumed to consist
-of some input variables, output variables and local variables (or
-states). The software requirements specify the
-behaviour of the outputs and local variables based on patterns
-in the inputs and local variables. Table~\ref{tab:edt-alarm} gives an example inspired from
-\cite{Venkatesh:ENASE:2015} which describes selected requirements of a
-car alarm module.
+Expressive Decision Tables (EDTs)~\cite{Venkatesh:DATE:2014} are a tabular
+notation for specifying software requirements and have been used in various
+industrial settings~\cite{Venkatesh:ENASE:2015}.  An EDT specification consists
+of several tables where columns specify input, output and input/output (I/O) or
+local ports, and rows specify the relationship between input and output
+values on these ports. Each port is associated with an alphabet and each cell in a table consists of a string of letters from this alphabet with discrete
+time. In this paper we consider EDT without time. A cell in  an EDT table
+is said to match when the string given in that cell is a subscript of the values seen for the
+input port corresponding to that cell's column. A row of an EDT matches when
+all the cells corresponding to that row match and one cell matches on the last
+input.  Table~\ref{tab:edt-alarm} gives an example, adapted from
+\cite{Venkatesh:ENASE:2015}, specifying a subset of requirements of a car alarm
+module.
 
 \begin{table}[h!]
-  \centering \def\arraystretch{1.2}
+  \centering \def\arraystretch{1.5}
   \caption{EDT for an Alarm module}
   \label{tab:edt-alarm}
   \begin{tabular}{|c|c|c|c||c|c|}
     \hline
-    sno & \specialcell{in \\ Ignition} &
-                                         \specialcell{in \\ PanicSw} &
+    sno & \specialcell{in  I} &
+                                         \specialcell{in  P} &
                                                                        \specialcell{in 
-    \\ Alarm} & \specialcell{out \\ Alarm} & 
-                                             \specialcell{out \\ Flash} \\
+     A} & \specialcell{out  A} & 
+                                             \specialcell{out  F} \\
     \hline 
-    1 & Off & (Press; Press)\{$<3$s\} & Off & On &
+    1 & F & P;P & F& N &
     \\
     \hline
-    2 & & Press\{$>3$s\} & On & Off & False \\
+    2 & & R;R;R & N & F & F\\
     \hline
-    3 & On & & & Off & False \\
+    3 & N & & & F & F\\
     \hline
   \end{tabular}
   
 \end{table}
-An EDT can be seen as being divided into two sides - the input side
-and the output side. Column headers on the input side describe the
-input and local variables, and are prefixed with \emph{in}. Similarly,
-column headers on the output side describe the local and output
-variables, and are prefixed by \emph{out}. Local variables occur on
-both sides. In Table~\ref{tab:edt-alarm}, note that the variable
-\emph{Alarm} appears on both the sides, making it a local
-variable. Each row gives a system requirement. The EDT of
-Table~\ref{tab:edt-alarm} gives a concise representation of the
+In the example EDT the input ports are prefixed with 
+\emph{in} and output ports are prefixed with \emph{out}. Input/Output ports are prefixed with both \emph{in} and \emph{out}.
+The EDT of
+Table~\ref{tab:edt-alarm} specifies the
 following requirements:
 \begin{enumerate}
-\item If \emph{Ignition} and \emph{Alarm} are \emph{Off}, and
-  \emph{PanicSw} is pressed twice within $3$ seconds, then
-  \emph{Alarm} should be turned \emph{On}.
+	\item If the most recent values on Ports \emph{I} (Ignition) and \emph{A} (Alarm) are \emph{F}(Off), and
+		the last two values on the Port \emph{P} are $P;P$ (Press), then
+		the value \emph{N}(On) is output on the port \emph{A}.
 
-\item If it is more than $3$ seconds since the \emph{PanicSw} is
-  pressed, and the \emph{Alarm} is \emph{On}, then \emph{Flash}
-  should be \emph{False} and \emph{Alarm} should be turned \emph{Off}.
+\item If the last three values on Port \emph{P} are
+	$R;R;R$ (Release), and the last value for \emph{A} is \emph{N}, then output the value \emph{F} (False) on \emph{F}
+		and output \emph{F} on \emph{A}.
 
-\item If \emph{Ignition} becomes \emph{On}, then \emph{Flash} should
-  be \emph{False} and \emph{Alarm} should be \emph{Off}.
+	\item If last value on \emph{I} is \emph{N}, then \emph{F} is output on \emph{F} 
+		and \emph{F} is output on \emph{A}.
 \end{enumerate}
 
-A test case for a requirement is a sequence of inputs that triggers
-the particular requirement. EDTs have been successfully applied to
-generate test cases for software requirements --- thanks to the simple
-syntax, system engineers are comfortable in translating a large set of
-requirements into EDTs and algorithms for generating test cases have
-been studied and shown to be more effective than manual
-testing~\cite{Venkatesh:ENASE:2015}. However, the notation lacks a
-rigorous formal semantics, except for a brief description of key
-elements of formal semantics in~\cite{Venkatesh:DATE:2014}. Current
-test generation algorithms are based on this intuitive understanding
-of the language, and apply heuristics to cover as many requirements as
-possible. 
+A test case for a requirement is a sequence of Port values  that match the
+EDT row for that requirement. The use of EDTs and test case generation
+algorithms from EDT specifications have been widely studied.
+~\cite{Venkatesh:ENASE:2015}. However, the notation lacks a rigorous
+formal semantics, except for a brief description of key elements of formal
+semantics in~\cite{Venkatesh:DATE:2014}. Hence, none of the test case algorithms use
+formal techniques like model checking and instead rely in random generation
+using heuristics. These algorithms, therefore, cannot prove that an EDT row
+cannot be matched and also find it hard to match certain rows. We overcome both
+these limitations by providing a formal semantics for EDTs (without timing)
+through a translation to mDSA.
 %When certain requirements do not get covered, a manual 
 % As we will show in this paper, the mechanics of
 %EDTs is intricate due to various interactions between the rows. An
@@ -77,36 +75,74 @@ possible.
 
 \subsection{Translating EDT to mDSA}
 
-We give a semantics for EDT, restricted to being without timing, via mDSAs. 
+An EDT with $I$ input columns and $R$ rows is translated to an mDSA, with one
+state $q$ and an alphabet $\Sigma = \langle \Sigma_1 \cdots \Sigma_I \rangle$.
+Each $\Sigma_i$ corresponds to the Port of column $i$ and the
+letters of the alphabet correspond to the values that the Signal can take
+prefixed by $<Portname:>$. Thus if the Port name of the first
+column is $A$ and its alphabet is ${ a_1, a_2, \cdots, a_k}$ then the
+corresponding alphabet $\Sigma_1 = {A:a_1, A:a_2 \cdots A:a_k}$. 
+Each EDT row is translated to an mDSA as follows:
 \begin{itemize}
-\item
-Every EDT has a corresponding mDSA with one state.
-\item
+\item The mDSA has exactly one state - $q_0$
+\item 
 The alphabets of all the ports together make a multi-port alphabet for the mDSA
 \item
 Each port has a corresponding tape. Each row has a tape head in each tape, corresponding to itself.
 \item
-Every row becomes a transition label of the same form, looping back into the state.
+There is a transition corresponding to each row with $q_0$ as both the source and target state. 
 \item
-The mDSA described above then captures the behaviour of the EDT
+The label of each transition consists of all the strings in the cells of the input columns of the row combined using the $||$ operator.
+\item 
+The output of the transitions are the strings in the cell corresponding to the output columns
 \end{itemize}
 
-The mDSA above is a succinct representation of the EDT semantics. The states of a multi-port DSA are defined as per the requirements of the system it models. For a system with internal variables $S_1,S_2,\dots$ with each variable $S_i$ having an alphabet $\Sigma_{S_i}$, the corresponding \mdsa has states $Q=\Sigma_{S_1} \times \Sigma_{S_2} \times \dots$, but as seen earlier, this can be captured using additional tape instead. The additional tapes $B_{S_1}, B_{S_2}, \dots$ are for the internal variables used in the system. These variables can read input as well as produce output, over the alphabet representing their state space. %For example, a variable $S_i$ has an alphabet $\Sigma_{S_i}$ with letters that can be input as well as output.
+The mDSA in Figure~\ref{fig:state-diagram} is a mDSA specification corresponding the EDT given in Table~\ref{tab:edt-alarm}
 
-Transitions must then be enhanced in our semantics i.e. a transition can now require the local variables $S_1, S_2,\dots$ to have values $(s_1, s_2 \dots)$  for it to match. When triggered, the values then change to $(s'_1,s'_2,\dots)$. Assume each variable $S_i$ has its corresponding tape labeled $B_{S_i}$%(we relabel the tapes $B_{k+1}, B_{k+2}, \dots, B_{k'}$ appropriately)
-. Let us use the syntax $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots) \rangle$ to represent this.
+\begin{figure}[htbp]
+    \centering
+\begin{tikzpicture}[
+    > = stealth,
+    shorten > = 1pt,
+    auto,
+    node distance = 3cm,
+    semithick
+]
 
-\begin{enumerate}
-\item A transition (with label $j$) $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots) \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of each $B_{S_i}$ is $s_i$, and either $H_{i}^{j}$ is at the end or the entire $u_i$ is after $H_{i}^{j}$. Additionally, at least one tape is non-empty after $H_{i}^{j}$.
+% Setup the styles for the states
+\tikzstyle{accepting}=[double, draw=black, circle, minimum size=1cm]
+\tikzstyle{state}=[draw=black, circle, minimum size=1cm]
 
-\item A matched transition is then triggered, moving each $H_{i}^{j}$-head of $B_i$ (or $B_{S_i}$) to the end. Additionally $\forall s'_i \ne \epsilon$, the corresponding $B_{S_i}$ extends by one position to the right and stores $s'_i$.
-\end{enumerate}
+% Draw the state
+\node[state, initial, accepting] (q0) {$q_0$};
 
-\textcolor{red}{Semantics for Row sequences}
-We introduce the notion of a multi-transition, a transition with multiple parts that must occur in sequence. Let us illustrate with a two-part transition $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots)$ ; $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k), (s'''_1,s'''_2,\dots) \rangle$. For it to match, each $B_i (i\le k)$ must have $u_i  u'_i$ as suffix, each $B_{S_i}$ has $s_i  s''_i$, and either $H_{i}^{j}$ is at the end or the entire $u'_i$ occurs after $H_i^j$. Additionally, at least one tape is non-empty after $H_i^j$ heads. Not only this, all of $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k)$ must occur after $(s_1, s_2 \dots), (u_1, \dots, u_k)$. That is each for any $i,j$ we have $u'_i$ and $s''_i$ appearing after $u_j$ and $s_j$. When the matched transition is triggered, the tapes and their head positions are updated as earlier.
+% Draw the transition (self-loop)
+\draw (q0) edge[loop above] node{$I:F$$\|$$P:P;P:P$$\|$$A:F$/$A:N$} (q0);
+\draw (q0) edge[loop right] node{$P:R;P:R;P:R$$\|$$A:N$/$A:F$$\|$$F:F$} (q0);
+\draw (q0) edge[loop below] node{$I:N$/$A:F$$\|$$F:F$} (q0);
 
-\textcolor{red}{TODO: Reachability for mDSA vs Test generation for EDT. Complexity result (possibly PSPACE-complete)}
+\end{tikzpicture}
+\caption{mDSA of the Alarm EDT}
+    \label{fig:state-diagram}
+\end{figure}
 
+
+%%The mDSA above is a succinct representation of the EDT semantics. The states of a multi-port DSA are defined as per the requirements of the system it models. For a system with internal variables $S_1,S_2,\dots$ with each variable $S_i$ having an alphabet $\Sigma_{S_i}$, the corresponding \mdsa has states $Q=\Sigma_{S_1} \times \Sigma_{S_2} \times \dots$, but as seen earlier, this can be captured using additional tape instead. The additional tapes $B_{S_1}, B_{S_2}, \dots$ are for the internal variables used in the system. These variables can read input as well as produce output, over the alphabet representing their state space. %For example, a variable $S_i$ has an alphabet $\Sigma_{S_i}$ with letters that can be input as well as output.
+%%
+%%Transitions must then be enhanced in our semantics i.e. a transition can now require the local variables $S_1, S_2,\dots$ to have values $(s_1, s_2 \dots)$  for it to match. When triggered, the values then change to $(s'_1,s'_2,\dots)$. Assume each variable $S_i$ has its corresponding tape labeled $B_{S_i}$%(we relabel the tapes $B_{k+1}, B_{k+2}, \dots, B_{k'}$ appropriately)
+%%. Let us use the syntax $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots) \rangle$ to represent this.
+%%
+%%\begin{enumerate}
+%%\item A transition (with label $j$) $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots) \rangle$ is matched if each $B_i (i\le k)$ has $u_i$ as suffix, the last letter of each $B_{S_i}$ is $s_i$, and either $H_{i}^{j}$ is at the end or the entire $u_i$ is after $H_{i}^{j}$. Additionally, at least one tape is non-empty after $H_{i}^{j}$.
+%%
+%%\item A matched transition is then triggered, moving each $H_{i}^{j}$-head of $B_i$ (or $B_{S_i}$) to the end. Additionally $\forall s'_i \ne \epsilon$, the corresponding $B_{S_i}$ extends by one position to the right and stores $s'_i$.
+%%\end{enumerate}
+%%
+%%\textcolor{red}{Semantics for Row sequences}
+%%We introduce the notion of a multi-transition, a transition with multiple parts that must occur in sequence. Let us illustrate with a two-part transition $\langle (s_1, s_2 \dots), (u_1, \dots, u_k), (s'_1,s'_2,\dots)$ ; $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k), (s'''_1,s'''_2,\dots) \rangle$. For it to match, each $B_i (i\le k)$ must have $u_i  u'_i$ as suffix, each $B_{S_i}$ has $s_i  s''_i$, and either $H_{i}^{j}$ is at the end or the entire $u'_i$ occurs after $H_i^j$. Additionally, at least one tape is non-empty after $H_i^j$ heads. Not only this, all of $(s''_1, s''_2 \dots), (u'_1, \dots, u'_k)$ must occur after $(s_1, s_2 \dots), (u_1, \dots, u_k)$. That is each for any $i,j$ we have $u'_i$ and $s''_i$ appearing after $u_j$ and $s_j$. When the matched transition is triggered, the tapes and their head positions are updated as earlier.
+%%
+%%\textcolor{red}{TODO: Reachability for mDSA vs Test generation for EDT. Complexity result (possibly PSPACE-complete)}
+%%
 %\input{basic.tex}
 
 
