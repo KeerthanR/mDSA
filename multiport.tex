@@ -1,0 +1,13 @@
+\section{Extending DSA with multiple ports}
+
+Let 
+
+\begin{definition}[Multi-port DSA (mDSA)]
+    Let $\Sigma = (\Sigma_1, \Sigma_2, \dots, \Sigma_k)$ be a multi-port alphabet. A multi-port DSA (mDSA in short) $\Aa$ is given by a tuple $(Q, \Sigma, q_0, \Delta, F)$ where $Q$ is a finite set of states, $q_0$ is the initial state and $F \incl Q$ is a set of final states, and $\Delta : Q \times \Sigma_1^* \times \Sigma_2^* \times \cdots \times \Sigma_k^* \rightharpoonup Q$ is a  partial function with a finite domain. We assume that  Each transition therefore is of the form $(q, u, q')$ where $q, q' \in Q$ and $u \in \Sigma^*$. 
+    
+    We write $\out(q) := \{ w \in \Sigma^+ \mid \Delta(q, u) \text{ is defined }\}$.
+    \end{definition}
+
+    There is an input read-only tape  and $k$ work tapes, one for each port. The mDSA reads the input one by one. On reading a letter, it copies it to the corresponding work tape. The right head of the work tape moves to this position. If there is some rule in $\out(q)$ which is matched: $u_i$ appears as a suffix of correpsonding tape, and there is at least one tape such that $u_i$ appears as a suffix of $T_i[\lt_i, \rt_i]$. This corresponds to the examples of the introduction. Explain.
+
+    
