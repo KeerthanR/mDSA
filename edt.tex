@@ -15,24 +15,20 @@ input.  Table~\ref{tab:edt-alarm} gives an example, adapted from
 \cite{Venkatesh:ENASE:2015}, specifying a subset of requirements of a car alarm
 module.
 
+\newcolumntype{A}{>{\centering}p{1cm}}
 \begin{table}[h!]
   \centering \def\arraystretch{1.5}
   \caption{EDT for an Alarm module}
   \label{tab:edt-alarm}
-  \begin{tabular}{|c|c|c|c||c|c|}
+	\begin{tabular}{|A|A|A|A||A|c|}
     \hline
-    sno & \specialcell{in  I} &
-                                         \specialcell{in  P} &
-                                                                       \specialcell{in 
-     A} & \specialcell{out  A} & 
-                                             \specialcell{out  F} \\
-    \hline 
-    1 & F & P;P & F& N &
-    \\
+    s.no & in  I & in  P & in A & out  A & out  F \\
+	 \hline
+    1 & F & P;P & F& N & I \\
     \hline
-    2 & & R;R;R & N & F & F\\
+    2 & & R;R;R & N & F & F \\
     \hline
-    3 & N & & & F & F\\
+    3 & N & & & F & F \\
     \hline
   \end{tabular}
   
