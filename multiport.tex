@@ -1,6 +1,77 @@
 \section{Extending DSA with multiple ports}
 
-Let 
+Consider a special kind of an alphabet
+$\Sigma = \langle \Sigma_1, \Sigma_2, \dots, \Sigma_k \rangle$ such
+that $\Sigma_i \cap \Sigma_j = \emptyset$ for all $i, j \in
+[1..k]$. We will call $\Sigma_i$ as the alphabet of \emph{port} $i$,
+and $\Sigma$ as a \emph{multi-port} alphabet. We
+look at DFAs over such multi-port alphabets. Such DFAs model systems
+that listen to inputs from different processes and perform actions
+based on them. Sometimes the order in which the system receives its
+inputs from different ports is not relevant.%
+  
+For example, at a state
+$s$, if the system receives $a$ from port 1 and $b$ from port 2, in any
+order, then it has to go to state $t$.  A DFA would model this with
+transitions: $s \xra{a} s_a \xra{b} t$ and $s \xra{b} s_b \xra{a}
+t$. A DSA would contain two transitions $s \xra{ab, ba} t$ (and some
+other transitions, if needed, to take care of $aa$, $bb$). To get a
+more succinct notation we will use a $\parallel$ operator. We will
+write $s \xra{a \parallel b} t$ to mean that at state $s$, when
+both $a$ and $b$ are received, the automaton moves to $t$. When there
+are several components, this notation leads to significant
+succinctness, for instance $a_1 \parallel a_2 \cdots \parallel a_n$
+stands for all the $n!$ permutations of $a_1$ to $a_n$. We will also
+allow expressions of the form $a_1 a_2 \parallel b$, which stands for
+the set of words $\{a_1 a_2 b, a_1 b a_2, b a_1 a_2\}$ which shuffles
+$a_1a_2$ and $b$. We will now formalize this idea by enhancing DSA with
+the $\parallel$ operator and then consider the problem of synthesizing
+such extended DSA. We begin with some notation.%
+
+
+
+
+% \paragraph*{Notation} For a word $w \in \Sigma^*$, we write
+% $\proj{i}(w)$ for the projection of $w$ onto the set $\Sigma_i$. For
+% instance, if $\Sigma_1 = \{a_1, a_2\}, \Sigma_2 = \{b_1, b_2\}$ and
+% $w = a_1 b_1 a_2 a_1 b_2 b_2$, we have $\proj{1}(w) = a_1 a_2 a_1$ and
+% $\proj{2}{w} = b_1 b_2 b_2$.  We write $\partial w$ for the $k$-tuple
+% $(\proj{1}(w), \proj{2}(w), \dots, \proj{k}(w))$ of projections of $w$
+% onto each port $\Sigma_i$, and will call $\partial w$ the
+% \emph{decomposition} of $w$. Notice that if
+% $\partial w_1 = \partial w_2$ for two words $w_1, w_2$, then $w_1$ and
+% $w_2$ have the same order of events within each port, but could have a
+% different ordering between letters from different ports.%
+
+
+\begin{definition} Let
+ $\Sigma = \langle \Sigma_1, \Sigma_2, \dots, \Sigma_k \rangle$ be a
+ multi-port alphabet. A \emph{multi-port (deterministic)
+   suffix-reading automaton} (written in short) $\Aa$ is a
+ tuple $(Q, \Sigma, q^{init}, \delta, F)$ where $Q$, $q^{init}$ and
+ $F$ are a finite set of states, the initial state and a set of
+ accept states, respectively. The transition relation
+ $\delta \incl Q \times (\Sigma_1^* \times \Sigma_2^* \times \cdots
+ \times \Sigma_k^*) \times Q$: each transition is of the form
+ $(q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ where
+ $u_i \in \Sigma_i^*$ (not all of them can be $\epsilon$).
+ % We assume that for every two outgoing
+ % transitions
+ % $(q, (u_1, u_2, \dots, u_k), q_1)$ and
+ % $(q, (v_1, v_2, \dots, v_k), q_2)$ there is at least one port $i$
+ % such that $u_i$ and $v_i$ are suffix-incomparable, that is,
+ % $u_i \not \sfx v_i$ and $v_i \not \sfx u_i$.
+\end{definition}%
+
+
+A configuration is given by $(q, i, \Lambda)$ where $\Lambda$ gives the position of the left and right tape heads for every tape $j$: $\Lambda_j(\lt), \Lambda_j(\rt)$.
+
+$(q, i, \Lambda) \xra{T(i+1)} (q', i+1, \Lambda') $ as follows: (let $a = T(i+1)$)
+\begin{itemize}
+\item if $a \in \Sigma_m$, then $a$ is appended to the right of tape $B_m$, and the tape head $\rt_m$ moves one step to the right.
+\item there is some transition $(q, u_1 \parallel u_2 \parallel \cdots \parallel u_k) q'$ such that each $u_i$ is a suffix of $B_i$ and there is at least one $i$ such that $u_i$ is a suffix of $B_i[\Lambda(\lt), \Lambda(\rt)]$,
+\item $\Lambda'_i(\lt) = \Lambda'_i(\rt) = \Lambda_i(\rt) + 1$. 
+\end{itemize}
 
 \begin{definition}[Multi-port DSA (mDSA)]
     Let $\Sigma = (\Sigma_1, \Sigma_2, \dots, \Sigma_k)$ be a multi-port alphabet. A multi-port DSA (mDSA in short) $\Aa$ is given by a tuple $(Q, \Sigma, q_0, \Delta, F)$ where $Q$ is a finite set of states, $q_0$ is the initial state and $F \incl Q$ is a set of final states, and $\Delta : Q \times \Sigma_1^* \times \Sigma_2^* \times \cdots \times \Sigma_k^* \rightharpoonup Q$ is a  partial function with a finite domain. We assume that  Each transition therefore is of the form $(q, u, q')$ where $q, q' \in Q$ and $u \in \Sigma^*$. 
@@ -10,4 +81,3 @@ Let
 
     There is an input read-only tape  and $k$ work tapes, one for each port. The mDSA reads the input one by one. On reading a letter, it copies it to the corresponding work tape. The right head of the work tape moves to this position. If there is some rule in $\out(q)$ which is matched: $u_i$ appears as a suffix of correpsonding tape, and there is at least one tape such that $u_i$ appears as a suffix of $T_i[\lt_i, \rt_i]$. This corresponds to the examples of the introduction. Explain.
 
-    
