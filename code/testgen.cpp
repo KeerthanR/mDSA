@@ -1,48 +1,9 @@
-/* This is an implementation of mDSA, that is, multi-port DSA.
-
-The number of Input Ports (or input variables in EDT) is NumInpPorts. They are numbered from 1 to NumInpPorts. 
-The alphabet of any two ports are disjoint. A pair of integers (i, j) represents the j-th letter in the alphabet of Port i.
-
-There are NumLocalPorts local (or state / internal) variables, which are numbered from 1 to NumLocalPorts. 
-Their alphabet is represented similarly as above - (i,j) corresponds to the j-th letter in the alphabet of the i-th local variable.
-
-[It will be clear from context as to whether (i,j) refers to the i-th Input Port or the i-th Local Port]
-In the definition of the transitions (part of input), the Port number is excluded, as it is clear from the context.
-
-InpAlphabetSize[i] denotes the size of the alphabet of the i-th Input Port. So the alphabet is {1, 2, ..., InpAlphabetSize[i]}.
-LocalAlphabetSize[i] denotes the size of the alphabet of the i-th Local Port. So the alphabet is {1, 2, ..., LocalAlphabetSize[i]}.
-
-Transitions (or EDT row definitions) :
-There are a total of NumTransitions transitions.
-We assume that the EDT row definitions are given in decreasing priority order. 
-That is, if at a given moment, two rows can be triggered, the row defined earlier is triggered first.
-We are ignoring timing and Row Sequences for now.
-The i-th transition is given as follows: 
-(TInpLen[i][NumInpPorts+1], TInp[i][NumInpPorts+1], TLocalInp[i][NumLocalPorts+1], TLocalOut[i][NumLocalPorts+1], TOut).
-TInp[i][NumInpPorts+1] is an array of size NumInpPorts+1 (1-indexed), each element of which is a string. 
-TInp[i][j] should be a suffix of the j-th Input Channel for the i-th transition to be triggered.
-TInpLen[i][j] stores the length of TInp[i][j].
-TLocalInp[i][NumLocalPorts+1] is an array of size NumLocalPorts+1 (1-indexed), each element of which is a character. 
-TLocalInp[i][j] should be the last character of the j-th Local Channel for the i-th transition to be triggered.
-TLocalOut[i][NumLocalPorts+1] is an array of size NumLocalPorts+1 (1-indexed), each element of which is a character. 
-TLocalOut[i][j] is the character written to the j-th Local Channel when the i-th transition is triggered.
-TLocalInp, and TLocalOut can also be (-1, -1), which signifies that it is a null string. 
-TInp can be empty if it is a null string, and TInpLen will be 0 in such a case.
-TOut is the output produced when this transition is triggered.
-
-InpTape[i] is the tape corresponding to the i-th input port.
-LocalTape[i] is the tape corresponding to the i-th local variable.
-InpTapeHead[i][j] is the tape head on the j-th input tape corresponding to the i-th transition.
-LocalTapeHead[i][j] is the tape head on the j-th local tape corresponding to the i-th transition.
-IOTape contains all the inputs and outputs produced, interleaved in sequence. This is outputted at the very end. Output a is displayed as "Output a".
-
-
+/* 
 Input Format:
 First line should have two integers (everything is space-separated) - NumInpPorts, and NumLocalPorts.
 The next line contains NumInpPorts integers, which denote the size of the alphabet of each of the Input Ports. (InpAlphabetSize[i])
 The next line contains NumLocalPorts integers, which denote the size of the alphabet of each of the Local Ports. (LocalAlphabetSize[i])
 The next line contains NumLocalPorts integers, which denote the default values on the Local Ports. (Stored directly in LocalTape[i])
-
 [empty line]
 The next line should have a single integer - NumTransitions
 [empty line]
@@ -54,11 +15,12 @@ Then NumTransitions many sets of lines follow, the i-th of which should follow t
     The next NumLocalPorts lines contain a single integer each, which denote the Local Port output values, if this transition is triggered.
     Then a single line with a single integer, TOut, which is the integer outputted when this transition is triggered.
 [empty line after each transition]
-Then the input stream starts. Each line should contain two integers a and b. a denotes the port number, and b is the actual input. 
-The stream ends with (-1, -1).
+A single line with a single integer - the index of the transition (1-indexed) that needs to be trigerred.
 
 Output Format:
-All the inputs and outputs produced are outputted at the end, interleaved in sequence. Output a is displayed as "Output a".
+The requisite input, two integers in each line.
+[empty line]
+All the inputs and outputs produced by the above input string, are outputted at the end, interleaved in sequence. Output a is displayed as "Output a".
 */
 
 #include <bits/stdc++.h>
@@ -72,7 +34,7 @@ const int MaxNumLocalPorts = 100;
 const int MaxNumTransitions = 1000;
 
 int NumInpPorts, NumLocalPorts, NumTransitions;
-int InpAlphabetSize[MaxNumInpPorts+1], LocalAlphabetSize[MaxNumLocalPorts+1];
+int InpAlphabetSize[MaxNumInpPorts + 1], LocalAlphabetSize[MaxNumLocalPorts + 1];
 int TInpLen[MaxNumTransitions + 1][MaxNumInpPorts + 1]; // Doesn't need to be stored
 vector < int > TInp[MaxNumTransitions + 1][MaxNumInpPorts + 1];
 vector < pair < int, int > > IOTape;
@@ -85,8 +47,15 @@ int InpTapeHead[MaxNumTransitions + 1][MaxNumInpPorts + 1]; // Points to the las
 int LocalTapeHead[MaxNumTransitions + 1][MaxNumLocalPorts + 1]; // Points to the last character which has been consumed. So initialized with -1
 int a, b; // temp variables
 
+int TargetTransition;
+int InpMaxLen[MaxNumInpPorts + 1];
+int TotalAlphabetSize = 0, TotalInpAlphabetSize = 0;
+int MaxInpLen;
+vector < pair < int, int > > InputString, AnsString;
+bool FoundTarget = false;
 
-void initialize() //If ever the LocalTape is reinitialized here, remember about the default values
+
+void initialize()
 {
     for (int i = 1; i <= NumTransitions; i++)
     {
@@ -99,6 +68,19 @@ void initialize() //If ever the LocalTape is reinitialized here, remember about 
             LocalTapeHead[i][j] = -1;
         }
     }
+
+    for (int i = 1; i <= NumInpPorts; i++)
+    {
+        InpTape[i].clear();
+    }
+    IOTape.clear();
+    for (int i = 1; i <= NumLocalPorts; i++)
+    {
+        a = LocalTape[i][0]; // Default value
+        LocalTape[i].clear();
+        LocalTape[i].push_back(a);
+    }
+
     return;
 }
 
@@ -190,10 +172,17 @@ int main() {
 
     cin >> NumInpPorts >> NumLocalPorts;
 
-    for(int i = 1; i <= NumInpPorts; i++)
+    for (int i = 1; i <= NumInpPorts; i++)
+    {
         cin >> InpAlphabetSize[i];
-    for(int i = 1; i <= NumLocalPorts; i++)
+        TotalAlphabetSize += InpAlphabetSize[i];
+        TotalInpAlphabetSize += InpAlphabetSize[i];
+    }
+    for (int i = 1; i <= NumLocalPorts; i++)
+    {
         cin >> LocalAlphabetSize[i];
+        TotalAlphabetSize += LocalAlphabetSize[i];
+    }
 
     //Inputting default values for the local variables
     for(int i = 1; i <= NumLocalPorts; i++)
@@ -218,6 +207,7 @@ int main() {
         for (int j = 1; j <= NumInpPorts; j++)
         {
             cin >> TInpLen[i][j];
+            InpMaxLen[j] = max(InpMaxLen[j], TInpLen[i][j]);
             for (int k = 1; k <= TInpLen[i][j]; k++)
             {
                 cin >> a;
@@ -233,43 +223,114 @@ int main() {
         cin >> TOut[i];
     }
 
-    // Inputting the string
-    while (1)
+    cin >> TargetTransition;
+
+    MaxInpLen = 1;
+    for (int i = 1; i <= NumInpPorts; i++)
     {
-        cin >> a >> b; //(a, b) is the next character of the string, where a is the port number
-        if (a == -1)
-            break;
-
-        assert((a >= 1) && (a <= NumInpPorts));
-
-        InpTape[a].push_back(b);
-        IOTape.push_back(make_pair(a, b));
-
-        while (1)
+        for (int j = 1; j <= InpMaxLen[i]; j++)
         {
-            bool TriggeredAny = false;
-            for (int i = 1; i <= NumTransitions; i++)
+            MaxInpLen *= InpAlphabetSize[i]; // +1 for null string?
+        }
+    }
+    for (int i = 1; i <= NumLocalPorts; i++)
+    {
+        MaxInpLen *= LocalAlphabetSize[i];
+    }
+    MaxInpLen++; //
+
+    cout << "Max Inp Len is " << MaxInpLen << "\n";
+
+    for (long long bitmask = 0; bitmask < pow(TotalInpAlphabetSize, MaxInpLen) + 1; bitmask++)
+    {
+        //cout<<bitmask<<"\n";
+        //Generating the input string
+        InputString.clear();
+        long long temp = bitmask;
+        for(int ww = 1; ww <= MaxInpLen; ww++)
+        {
+            long long temp2 = temp % TotalInpAlphabetSize;
+            temp2++;
+            temp /= TotalInpAlphabetSize;
+
+            for (int i = 1; i <= NumInpPorts; i++)
             {
-                if (CheckTrigger(i))
+                if (temp2 <= InpAlphabetSize[i])
                 {
-                    TriggeredAny = true;
-                    // cout << "Triggering " << i << endl;
-                    Trigger(i);
+                    InputString.push_back(make_pair(i, temp2));
                     break;
                 }
+                temp2 -= InpAlphabetSize[i];
             }
-            if (TriggeredAny == false) // None of the transitions got triggered. So we are at a 'stable' place, and can now read the next input.
+        }
+        InputString.push_back(make_pair(-1, -1));
+        AnsString.clear();
+        initialize();
+
+        //Checking the input string
+        for (int qq = 0; qq < InputString.size(); qq++)
+        {
+            a = InputString[qq].first;
+            b = InputString[qq].second;
+            //(a, b) is the next character of the string, where a is the port number
+            if (a == -1)
                 break;
+
+            assert((a >= 1) && (a <= NumInpPorts));
+
+            InpTape[a].push_back(b);
+            IOTape.push_back(make_pair(a, b));
+            AnsString.push_back(make_pair(a, b));
+
+            while (1)
+            {
+                bool TriggeredAny = false;
+                for (int i = 1; i <= NumTransitions; i++)
+                {
+                    if (CheckTrigger(i))
+                    {
+                        TriggeredAny = true;
+                        // cout << "Triggering " << i << endl;
+                        Trigger(i);
+                        if (i == TargetTransition)
+                        {
+                            FoundTarget = true;
+                            break;
+                        }
+                        break;
+                    }
+                }
+
+                if (FoundTarget == true)
+                    break;
+                if (TriggeredAny == false) // None of the transitions got triggered. So we are at a 'stable' place, and can now read the next input.
+                    break;
+            }
+            if (FoundTarget == true)
+                break;
+        }
+
+
+        if (FoundTarget == true)
+        {
+            cout << "Found Input String:\n";
+            for (int i = 0; i < AnsString.size(); i++)
+                cout << AnsString[i].first << " " << AnsString[i].second << "\n";
+
+            cout << "\nIOTape:\n";
+            for (int ii = 0; ii < SZ(IOTape); ii++)
+            {
+                if (IOTape[ii].first == -1)
+                    cout << "Output " << IOTape[ii].second << "\n";
+                else
+                    cout << IOTape[ii].first << " " << IOTape[ii].second << "\n";
+            }
+            break;
         }
     }
 
-    for (int ii = 0; ii < SZ(IOTape); ii++)
-    {
-        if (IOTape[ii].first == -1)
-            cout << "Output " << IOTape[ii].second << "\n";
-        else
-            cout << IOTape[ii].first << " " << IOTape[ii].second << "\n";
-    }
+    if(FoundTarget == false)
+        cout << "This transtion cannot be triggered.\n";
 
     return 0;
 }
