@@ -1,0 +1,34 @@
+\section{Multiport DSAs with outputs}
+
+In order to represent Expressive Decision Tables (EDTs) succinctly, we require an additional feature in the automaton -- the presence of output ports and more importantly input/output (IO) ports. When a transition is matched, we also require a certain output to be produced in an output port. Sometimes, these output ports can also be treated as inputs and checked for suffixes in the transition labels. Such ports will be called IO ports. Addition of these special ports enables a clean translation of EDTs to mDSAs. At the same time, as we will see, they make the emptiness problem significantly more complex. 
+
+\subsection{Formal syntax} 
+
+Below, we detail each element in the syntax of mDSA-with-outputs.
+
+\paragraph*{The multiport alphabet.} The multiport alphabet is now partitioned into three kinds: input ports, IO ports, and output ports. Let $\sigmain = (\Sigma_1^{i}, \Sigma_2^{i}, \dots, \Sigma_{k_1}^{i})$ be a set of input ports, $\sigmaio =(\Sigma_1^{io}, \Sigma_2^{io}, \dots, \Sigma_{k_2}^{io})$ be a set of IO ports and $\sigmaout = (\Sigma_1^{o}, \Sigma_2^{o}, \dots, \Sigma_{k_3}^{o})$ be a set of output ports. Each port is a finite alphabet. Further, we assume that no two alphabets coincide: therefore, each letter uniquely identifies the port that it is present in. 
+
+\paragraph*{Tape heads.} The automaton is equipped with a set $L = \{ \lt_1, \lt_2, \dots, \lt_p\}$ of tape heads. 
+
+\paragraph*{States.} States of an mDSA are now partitioned into two kinds: \emph{read states} which are the usual kind of states that receive inputs and match transitions, and \emph{write states} which simply write new values to (some of) the IO and output ports. In pictures, we represent read states using circles and write states using squares. We denote by $Q_r$ and $Q_w$ the set of read states and write states respectively. There is an initial state $q^{init}$ which could be either a read or a write state. 
+
+\paragraph*{Transitions.} Transitions out of read states $q$ look the same as before: $(q, (\lt: u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ where $q'$ could be any state (read/write) and each $u_j$ is a word in some $(\Sigma^i_\ell)^*$ (input port) or $(\Sigma^{io}_\ell)^*$ (IO port).  We assume that not all $u_j$ are $\epsilon$. As before, $\lt$ denotes a tape head. 
+
+From a write state $q$, there is a unique outgoing transition of the form: $(q, b_1 \parallel b_2 \cdots \parallel b_k, q')$ where $q'$ is a read state and each $b_i$ is a letter in some  $\Sigma^{io}_\ell$ (IO port) or $\Sigma^o_j$ (output port). So transitions out of an output state write new values to some of the IO and output ports.
+
+Notice that transitions from read states can lead to either read or write states, whereas transitions out of write states lead to read states; and read transitions can look for a combination of suffixes ($u_j$ are words) whereas write transitions write a single letter ($b_j$ are letters).
+
+\paragraph*{Acceptance condition.} The acceptance condition is given by a set of transitions out of read states.
+
+\paragraph*{Example.} We present an example in... \textcolor{red}{(TODO)}. We make use of shortcuts in definitions, explain that.
+
+\subsection{Semantics}
+
+A configuration is given by $(q, T, i_1, \dots, i_p)$ where $i_1, \dots, i_p$ denote the positions of the tape heads. 
+
+From a read state, we have transition $(q, T, i_1, \dots, i_p) \xra{a} (q, Ta, i_1, \dots, i_p)$ and $(q, T, i_1, \dots, i_p) \xra[\rho]{a} (q', Ta, i'_1 \dots i'_p)$ as before. 
+
+If $q$ is a write state, then there is a unique outgoing transition $(q, b_1 \parallel b_2 \cdots \parallel b_k, q')$. The idea is to add $b_1, \dots, b_k$ into the input tape, in some order (actual order does not matter). So we have a transition $(q, Tb_1 b_2 \dots b_k, i_1, \dots, i_p)$.
+
+
+These writes may induce a rule $q'$ to already match, even before seeing another input. Therefore, we allow $\epsilon$ transitions from read states: $(q, T, i_1, i_2, \dots, i_p) \xra[\rho]{\epsilon} (q', T, i'_1, \dots, i'_p)$ which simply change state and move the tape heads (with the same semantics). 
