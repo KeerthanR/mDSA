@@ -1,0 +1,10 @@
+\section{Complexity of emptiness}
+
+\begin{theorem}
+Emptiness for mDSA with outputs is PSPACE-complete.
+\end{theorem}
+\begin{proof}
+    Let $\Aa$ be an mDSA with outputs. Consider the transition system $S^\Aa$ describing the semantics of $\Aa$. Each node in the transition system is of the form $(q, T, i_1, i_2, \dots, i_p)$ where $T$ is the input tape, which can become arbitrarily long. Therefore, the transition system, viewed as it is, is infinite. Suppose $M$ is the maximum length among all words used in the transition labels of $\Aa$. To detect whether a transition $\lt: u_1 \parallel u_2 \parallel \cdots \parallel u_k$ matches a configuration, it is sufficient to maintain $M$ letters in each port, after each tape head $\lt$. Hence, letters which are not relevant anymore can be deleted from the tape. This bounds the tape length to $M \times p \times k$, where $k$ is the total number of ports. So, the total size of the truncated transition system is exponential in the size of the input. To verify emptiness, it is sufficient to guess a path in this transition system. Since each node requires polynomial space, and the length of the witness is bounded by an exponential in the size of the input, we deduce a PSPACE upper bound for the emptiness problem (following standard results from complexity theory).
+
+    For the hardness, we reduce the problem of DFA intersection to emptiness of mDSA with outputs. 
+\end{proof}
