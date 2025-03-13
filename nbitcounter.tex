@@ -1,0 +1,21 @@
+\section{N Bit Counter}
+Consider the following mDSA for an N bit counter:
+
+\begin{itemize}
+	\item has exactly two states $q_0, q_1$
+	\item has N + 2 tapes. One for input(I), one for the current tape pointer(P) and N tapes for the N bits ($b_0 \cdots b_{N-1}$)
+	\item The alphabet for the N bit tapes and input tape is $\{0,1\}$. The alphabet for the pointer tape is $\{0,1, \cdots, N-1\} \cup \{ \# \}$.
+	\item There is one transition from $q_0$ to $q_1$ with the label $b_0:1 \| b_1:1 \cdots \| b_{N-1}$
+	\item There is one transition from $q_0$ to $q_0$ to read inputs, $t_I$  with label  $I:1 / P:0$. When an input of 1 is seen from the environment set the bit to be processed to 0. 
+	\item There are $2N$ other transitions ($t_0^0 \cdots t_{N-1}^0$ and $t_0^1 \cdots t_{N-1}^1$)) for which:
+	\begin{itemize}
+		\item  source and target state for all the transitions is the same - $q_0$
+		\item The transition label for transition $t_i^0$ is $P:i \| b_i:0 / b_i:1 \| P:\#$. When there is carry and the value of this bit is 0 set the value of this bit to 1 and no further processing needed. 
+		\item The transition label for transition $t_i^1$ is $P:i \| b_i:1 / b_i:0\| P:i+1$. Set carry for next bit and set the value of this bit to 0.
+	\end{itemize}
+\end{itemize}
+
+
+The above mDSA will move to state $q_1$ only after seeing $2^N$ $1s$.
+
+
