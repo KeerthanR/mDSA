@@ -1,4 +1,5 @@
 \section{Introduction}
+\label{sec:intro}
 
   % Automata are very useful. In particular in formal verification and model-based testing.
 
@@ -66,30 +67,35 @@
    \centering
    \begin{tikzpicture}
       \begin{scope}[every node/.style={rectangle, rounded corners, draw, inner sep=3pt, thick}]
-        \node (0) at (0,0) {\scriptsize \texttt{Alarm=Off}};
-        \node (1) at (0,1.5) {\scriptsize \texttt{Alarm=On}};
-        \node (2) at (3.2,0) {\scriptsize \texttt{Car=Start}};
+        \node (0) at (0,0) {\scriptsize \texttt{Off}};
+        \node [double] (1) at (0,1.5) {\scriptsize \texttt{Error}};
+        \node (2) at (3.2,0) {\scriptsize \texttt{Started}};
+        \node (3) at (3.2,1.5) {\scriptsize \texttt{Drive}};
+      
       \end{scope}
 
-      \begin{scope}[->,>=stealth, thick]
-        \draw (-1,0) to (0);
-        \draw (0) to [bend left] node [left] {\scriptsize \texttt{On}} (1);
-        \draw (1) to [bend left] node [right] {\scriptsize \texttt{Off}} (0);
-        \draw (0) to node [above] {\scriptsize $K \parallel B \parallel P$} (2);
+      \begin{scope}[->,>=stealth, thick, auto]
+        \draw (-0.75,0) to (0);
+        %\draw (0) to [bend left] node [left] {\scriptsize \texttt{On}} (1);
+        %\draw (1) to [bend left] node [right] {\scriptsize \texttt{Off}} (0);
+        \draw (0) to node [below] {\scriptsize $B \parallel P \parallel$ \texttt{On}} (2);
+        \draw (2) to node [right] {\scriptsize $B \parallel D$ } (3);
+        \draw (3) to node [left] {\scriptsize $B \parallel P \parallel$ \texttt{Off}$~$} (0); 
+        \draw (3) to node [above] {\scriptsize $D \parallel$ \texttt{Off}} (1);
       \end{scope}
 
       \node at (1.5, -1.2) {\scriptsize $(a)$};
 
-      \begin{scope}[xshift=6cm]
+      \begin{scope}[xshift=6.5cm]
         \begin{scope}[every node/.style={rectangle, rounded corners, draw, inner sep=3pt, thick}]
-          \node (0) at (0,0) {\scriptsize \texttt{PhoneOff}};
-          \node (1) at (3,0) {\scriptsize \texttt{PhoneOn}};
+          \node [double] (0) at (0,0.75) {\scriptsize \texttt{PhoneOff}};
+          \node [double] (1) at (3,0.76) {\scriptsize \texttt{PhoneOn}};
         \end{scope}
 
         \begin{scope}[->,>=stealth, thick, auto]
-          \draw (-1,0) to (0);
-          \draw (0) to [bend left] node {\scriptsize $F \parallel T_1 T_2 T_3$} (1);
-          \draw (1) to [bend left] node {\scriptsize \texttt{Off}} (0);
+          \draw (-1,0.75) to (0);
+          \draw (0) to [bend left] node {\scriptsize $F \parallel T_1 T_2 T_3 \parallel$ \texttt{Press}} (1);
+          \draw (1) to [bend left] node {\scriptsize \texttt{Press}} (0);
         \end{scope}
 
         \node at (1.5, -1.2) {\scriptsize $(b)$};
@@ -101,8 +107,20 @@
    \label{fig:mdsa-examples}
    \end{figure}
    \paragraph*{Car Security System.} For a car to start, you need: key in ignition ($K$), brake pedal pressed ($B$), transmission in park ($P$), and no alarm triggered. The actions $K$, $B$ and $P$ can occur in any order. A DSA would need to represent this requirement using all $6$ permutations. Instead, we assume an alphabet that is distributed across different \emph{ports} -- ignition, brake pedal, transmission, and denote the concurrent actions as $K \parallel B \parallel P$. Figure~\ref{fig:mdsa-examples}(a) illustrates the enriched DSA.
+
+   \begin{itemize}
+   \item When the brake pedal is pressed ($B$) and transmission is in park $(P)$, if ignition becomes on ($ON$), then the car is started.
+   \item If the brake pedal is pressed ($(B)$) and the transmission is moved to drive ($D$), the car goes to the drive mode.
+   \item When the brake pedal is pressed ($B$), transmission is in park, and the ignition becomes off ($OFF$), the car is switched off. If ignition is switched off when brake is not pressed or when transmission is in drive/reverse, signal an error.
+   \end{itemize}
+
   
    \paragraph*{Smartphone Lock Pattern} To unlock a phone with pattern: fingerprint verification ($F$) and drawing specific gesture with three touch points ($T_1;T_2;T_3$). This is represented as $F \parallel (T_1 T_2 T_3)$ and the enriched DSA is shown in Figure~\ref{fig:mdsa-examples}(b).
+
+   \begin{itemize}
+   \item When the button is pressed ($B$), fingerprint verified and a correct pattern is received $(F_1 F_2 F_3)$, then the phone is switched on.
+   \item If the phone is on, and the button is pressed ($B$), the phone is switched off.  
+   \end{itemize}
    
   In Appendix~\ref{app:examples-of-parallel}, we give many more examples of similar situations that involve multiple ports and suffix-based requirements across all of them. To the best of our knowledge, no automaton model can represent such specifications succinctly. Incorporating concurrency into the specification is paramount when requirements talk about different components of the distributed system. 
   
