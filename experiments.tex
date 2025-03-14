@@ -1,0 +1,119 @@
+\section{Experiments}
+\label{sec:experiments}
+A testsuite $\Pi(\Tt)$ for an EDT $\Tt$ is a set of executions such
+that for each row $R$ of $\Tt$ there exists an execution
+$\pi \in \Pi$ and $\pi$ triggers $R$. To find a testsuite, we need to solve the test generation problem for each row.
+%The testsuite generation problem is to check whether there exists a testsuite for a given EDT.
+
+We have developed a prototype tool that implements an
+algorithm to solve the test generation problem by systematically
+exploring the configurations of an mDSA corresponding to the given EDT,
+$\Tt$.  %The tool does not handle timing.
+
+We conducted experiments to validate the following:
+
+\begin{enumerate}
+\item For simple EDTs, the tool can find test cases succesfully.
+\item There are some EDTs for which it can solve the test
+  generation problem, where randomized techniques (likely) cannot.
+\end{enumerate}
+
+%\texttt{Random} uniformly samples a set of executions, $\Pi_R(\Tt)$, of size
+%$N$, from the universal set of executions that have exactly $P$ inputs
+%and checks whether $\Pi_R(\Tt)$ is a testsuite for $\Tt$. \texttt{RGRaF}, on
+%the other hand, employs a heuristic to sample a set of executions of
+%size $N$ and checks whether it is a testsuite. \texttt{RGRaF} takes a parameter
+%$P$ to restrict the number of inputs in each execution.
+
+First we look at a couple of small EDTs. Table~\ref{tab:alarm-2} gives an example motivated from
+\cite{Venkatesh:ENASE:2015} which describes selected requirements of a
+car alarm module. It is similar to Table~\ref{tab:edt-alarm} from Section~\ref{sec:edt}. Encoding this in our tool gives a testcase (Press; Press) for Row 1.
+
+\begin{table}[h!]
+  \centering \def\arraystretch{1.2}
+  \caption{EDT for an Alarm module}
+  \label{tab:alarm-2}
+  \begin{tabular}{|c|c|c|c||c|c|}
+    \hline
+    sno & \specialcell{in \\ Ignition} &
+                                         \specialcell{in \\ PanicSw} &
+                                                                       \specialcell{in 
+    \\ Alarm} & \specialcell{out \\ Alarm} & 
+                                             \specialcell{out \\ Flash} \\
+    \hline 
+    1 & Off & (Press; Press)%\{$<1$s\} 
+    & Off & On &
+    \\
+    \hline
+
+    2 & On & & & Off & False \\
+    \hline
+  \end{tabular}
+  
+\end{table}
+
+Next we look at Table~\ref{tab:wiper}, a partial representation of a wiper module in a car. The tool finds a testcase for Row 2.
+
+\begin{table}[h!]
+  \centering \def\arraystretch{1.2}
+  \caption{EDT for a Wiper module}
+  \label{tab:wiper}
+  \begin{tabular}{|c|c|c|c|c||c|c|}
+    \hline
+    sno & \specialcell{in \\ ignition} &
+                                         \specialcell{in \\ wiperswitch} & 
+                                                                       \specialcell{in 
+    \\ parksensor} & \specialcell{in \\ error} & \specialcell{out \\ wipercmd} & 
+                                             \specialcell{out \\ error} \\
+    \hline 
+    1 & on & on & 
+    & false & wipe &
+    \\
+    \hline
+
+    2 & & & (park;notpark) & & dontwipe & true \\
+    \hline
+  \end{tabular}
+  
+\end{table}
+
+
+For the other claim, we created a specific kind of EDT for
+which the probability of randomized techniques selecting a required
+execution is very low. The EDT extends the three bit counter,
+shown in Table \ref{tab:binary}, to five bits and adds a 
+row to reset the counter. Our tool solves this problem, and hence for rows that have a very low probability of getting triggered
+it is better than randomized techniques.
+
+%Table \ref{tab:binary} shows a counter for $3$ bits.
+
+\begin{table}
+  \centering
+  \renewcommand{\arraystretch}{1.2} 
+  \caption{Implementing a binary counter for $3$ bits}
+  \label{tab:binary}
+  \begin{tabular}{|c|c|c|c|c||c|c|c|c|}
+    \hline
+    $T$ & $t_2$ & $t_1$ &$t_0$ & $S_T$ & $t_2$ & $t_1$ & $t_0$ & $S_T$                                                             
+    \\
+    \hline
+     \checkmark & & & & & & & & $+$  \\
+         
+    \hline
+     & & & $0$ & $+$ & & & $1$ & $-$  \\
+
+    \hline
+   & & $0$ & $1$ & $+$ & & $1$ & $0$ & $-$ \\
+
+    \hline
+   & $0$ & $1$ & $1$ & $+$ & $1$ & $0$ & $0$ & $-$ \\
+
+    \hline
+  \end{tabular}
+\end{table}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "m"
+%%% End:

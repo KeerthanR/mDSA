@@ -125,11 +125,6 @@ implements an $n$ bit counter. In order to match a row with $n$ ones,
 the row with $0$ followed by $(n-1)$ $1$ needs be matched $2^{n-1}$
 times. 
 %
-But thanks to the semantics of EDTs as Mealy machines, a natural
-algorithm for this problem is to compute the Mealy machine 
-on the fly and detect whether the row is triggered by a simple
-traversal of the machine.
-
 
 \begin{theorem}
   \label{thm:test-generation-PSPACE}
@@ -151,6 +146,8 @@ of states are mutually disjoint. Add a binary local variable $l_i$ and rules
 such that $l_i = 1$ if ``current'' state of $\Aa_i$ is accepting and
 otherwise $l_i = 0$. Add a row $\Land_i l_i = 1 \imp U$ for some
 update. This row matches iff there is a non-empty intersection.
+
+\input{experiments.tex}
 
 \section{Todos.}
 
