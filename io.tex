@@ -1,5 +1,28 @@
 \section{Multiport DSAs with outputs}
 
+In the last section, we have seen multi-port DSAs which process inputs across several ports and match transitions. In many situations, requirements also talk about outputting values to certain ports when transitions match. Here is an example of some requirements of a \emph{Car Alarm module}, adapted from~\cite{DBLP:conf/enase/VenkateshSZA15a}. 
+\begin{enumerate}
+\item If the most recent values on Ports \emph{I} (Ignition) and \emph{A} (Alarm) are \emph{F}(Off), and the last two values on the Port \emph{P} are $P;P$ (Press), then
+the value \emph{N}(On) is output on the port \emph{A}.
+
+\item If the last three values on Port \emph{P} are $R;R;R$ (Release), and the last value for \emph{A} is \emph{N}, then output the value \emph{F} (False) on \emph{F}
+and output \emph{F} on \emph{A}.
+
+\item If last value on \emph{I} is \emph{N}, then \emph{F} is output on \emph{F} and \emph{F} is output on \emph{A}.
+\end{enumerate}
+The first requirement checks for $I:Off \parallel A:Off \parallel P:Press;Press$ and immediately writes $On$ in port $A$. The check-and-update is a fully atomic operation. One way to model this requirement as an mDSA would be to absorb port $A$ as part of the state: that is the state of the mDSA is defined using values of such variables. However, this would lead to an exponential blowup in the number of states, if there are multiple such ports that are both read and written on transitions. To succinctly capture requirements with outputs, we allow both reads and writes on all ports and define \emph{mDSAs with outputs}. 
+
+\subsection{mDSA-with-outputs: formal syntax and semantics}
+
+The syntax of mDSA with outputs is almost the same as that of DSAs. The only difference is in the syntax of transitions.  As before, there is a multiport alphabet $\Sigma = \langle \Sigma_1, \dots, \Sigma_k \rangle$. An mDSA-with-outputs $\Bb$ is a tuple $(Q, \Sigma, q^{init}, \delta, F)$ where $Q$ is a finite set of states, $q^{init}$ is the initial state and $F$ is a set of accept states, $\delta$ is a finite set of transitions.
+
+\paragraph*{Transitions.} A transition now looks like:
+\begin{align*}
+q \xra[~~O_1: b_1 \parallel O_2: b_2 \parallel \cdots \parallel O_m: b_m~~]{I_1: u_1 \parallel I_2: u_2 \parallel \cdots \parallel I_k: u_k} q'
+\end{align*}
+where $q, q'$ are states; each $u_j$ is a word in the port alphabet of $I_j$; and each $b_j$ is a letter in the port alphabet of $O_j$. We remark that $\{I_1, \dots, I_k\} \cap \{O_1, \dots, O_m\}$ may be non-empty. In other words, some of the ports may appear both as input and output in a transition.  
+
+\paragraph*{Semantics.} Configurations of an mDSA-with-outputs are the same: $(q, w, \theta)$ with $q$ a state, $w$ the word seen so far 
 In order to represent Expressive Decision Tables (EDTs) succinctly, we require an additional feature in the automaton -- the presence of output ports and more importantly input/output (IO) ports. When a transition is matched, we also require a certain output to be produced in an output port. Sometimes, these output ports can also be treated as inputs and checked for suffixes in the transition labels. Such ports will be called IO ports. Addition of these special ports enables a clean translation of EDTs to mDSAs. At the same time, as we will see, they make the emptiness problem significantly more complex. 
 
 \subsection{Formal syntax} 
