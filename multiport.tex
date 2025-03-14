@@ -29,16 +29,17 @@ $a_1a_2$ and $b$. Section~\ref{sec:intro} illustrates further examples of the us
 $\proj{i}(w)$ for the projection of $w$ onto the set $\Sigma_i$. For
 instance, if $\Sigma_1 = \{a_1, a_2\}, \Sigma_2 = \{b_1, b_2\}$ and
 $w = a_1 b_1 a_2 a_1 b_2 b_2$, we have $\proj{1}(w) = a_1 a_2 a_1$ and
-$\proj{2}(w) = b_1 b_2 b_2$.  We write $\partial w$ for the $k$-tuple
-$(\proj{1}(w), \proj{2}(w), \dots, \proj{k}(w))$ of projections of $w$
+$\proj{2}(w) = b_1 b_2 b_2$.  %We write $\partial w$ for the $k$-tuple
+%$(\proj{1}(w), \proj{2}(w), \dots, \proj{k}(w))$ of projections of $w$
 onto each port $\Sigma_i$, and will call $\partial w$ the
-\emph{decomposition} of $w$. Notice that if
-$\partial w_1 = \partial w_2$ for two words $w_1, w_2$, then $w_1$ and
-$w_2$ have the same order of events within each port, but could have a
-different ordering between letters from different ports.%
+%\emph{decomposition} of $w$. 
+Notice that if for two words $w_1, w_2$ suppose $\proj{i}(w_1) = \proj{i}(w_2)$ for all ports $i$, then $w_1$ and $w_2$ have the same order of events within each port, but could have a different ordering between letters from different ports.% 
 
 
-\paragraph*{Challenges in extending to multiport.} For a DSA, a configuration was given by $(q, w)$ where $q$ is the current state and $w$ is the word seen after reaching $q$. Moreover, if a transition matches, the DSA moves to a configuration $(q', \epsilon)$ by fully consuming the word seen so far. Now consider the car security system example (Figure~\ref{fig:mdsa-examples} (a)) . On receiving inputs $P;B;\mathtt{On}$, the automaton moves to $\mathtt{Started}$ state, signaling that the car has started:
+\subsection{Challenges in extending to multiport}
+\label{sec:challenges}
+
+For a DSA, a configuration was given by $(q, w)$ where $q$ is the current state and $w$ is the word seen after reaching $q$. Moreover, if a transition matches, the DSA moves to a configuration $(q', \epsilon)$ by fully consuming the word seen so far. Now consider the car security system example (Figure~\ref{fig:mdsa-examples} (a)) . On receiving inputs $P;B;\mathtt{On}$, the automaton moves to $\mathtt{Started}$ state, signaling that the car has started:
 If the brake remains pressed and the transmission is moved to park, we would like the car to go into the drive mode. Therefore, on the word $P;B;\mathtt{On};D$, the automaton should go to the $\mathtt{Drive}$ state. This intention is summarized below as what we require as the run of the automaton:
 \begin{align*}
   \mathtt{Off} \quad \xra{P;B;\mathtt{On}} \quad \mathtt{Started} \quad \xra{D} \quad \mathtt{Drive}
@@ -59,9 +60,11 @@ If the brake remains pressed and the transmission is moved to park, we would lik
 
 %To cater to these different situations, we equip the automaton with multiple tape heads. Each tape head points to a position in the word seen so far. The rules can then specify the tape head since when the pattern is required to be true. Here is an example (\textcolor{red}{TODO}).
 
-\paragraph*{Formal definition.} We first describe the formal syntax and then proceed to an operational semantics given by a labeled transition system.
+\subsection{Multi-port DSAs: formal syntax and semantics} 
 
-\begin{definition} Let
+We first describe the formal syntax and then proceed to an operational semantics given by a labeled transition system.
+
+\begin{definition}[Multi-port DSA] Let
   $\Sigma = \langle \Sigma_1, \Sigma_2, \dots, \Sigma_k \rangle$ be a
   multi-port alphabet. A \emph{multi-port (deterministic)
     suffix-reading automaton} (written mDSA in short) $\Aa$ is a
@@ -72,13 +75,13 @@ If the brake remains pressed and the transmission is moved to park, we would lik
   $\delta \incl Q \times \Sigma_1^* \times \Sigma_2^* \times \cdots
   \times \Sigma_k^* \times Q$: each transition is of the form
   $(q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ where
-  $u_i \in \Sigma_i^*$ (not all of them can be $\epsilon$)%and $\lt_j$ is a tape head of $L$. 
+  $u_i \in \Sigma_i^*$ (not all of them can be $\epsilon$). %and $\lt_j$ is a tape head of $L$. 
   We assume there are only finitely many transitions. %The \emph{priority function} $\pi$ gives a total order on the set of transitions. 
  \end{definition}%
 Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is an example to illustrate the syntax of an mDSA. \textcolor{red}{(TODO)}.
 
  For the semantics, it is convenient to assume that there is a \emph{tape} on which the automaton writes all its inputs. Initially, the tape is $\epsilon$. Each time an input letter $a \in \Sigma$ is received, the automaton appends it to the right of the tape. 
- For a word $w = a_1 \dots a_{n}$, with $a_i \in \Sigma$, we write $w(i)$ to denote the letter $a_i$. The length $|w|$ equals $n$, the number of letters. For $j \in \{0, \dots, n-1\}$ we write $w[i, j]$ to denote the substring $a_i a_{i+1} \dots a_j$.
+ For a word $w = a_1 \dots a_{n}$, with $a_i \in \Sigma$, we write $w(i)$ to denote the letter $a_i$. The length of $w$, denoted as $|w|$, equals $n$ (the number of letters). For $j \in \{0, \dots, n-1\}$ we write $w[i, j]$ to denote the substring $a_i a_{i+1} \dots a_j$.
   %The $p$ tape heads $\lt_1, \lt_2, \dots, \lt_p$ point to various positions in the tape. A \emph{tape configuration} is therefore given as $(T, i_1, i_2, \dots, i_p)$ where $T$ is the current word in the tape, and $i_1, \dots, i_p \in \Nat$ are the positions pointed to by the heads $\lt_1, \dots, \lt_p$ respectively. A \emph{configuration} of an mDSA is then given by a state $q$ and a tape configuration: $(q, T, i_1, \dots, i_p)$. 
 
   A \emph{configuration} of an mDSA is given by $(q, w, \theta)$ where
@@ -87,7 +90,8 @@ Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is
   \item $w$ is the word read so far, from the beginning
   \item $\theta \in \Nat$ marks a position in the word where the last match of a transition appeared.  
   \end{itemize} 
-  The formal semantics of an mDSA is given by a transition system over the configurations. The initial configuration is $(q^{init}, \epsilon, 0)$. The transition relation is given as follows.
+  
+  The formal semantics of an mDSA $\Aa$ is given by a transition system $\Ss^\Aa = (S, S_0, \xra{}, S_F)$  over the configurations: the set of nodes $S$ is  the set of all configurations $(q, w, \theta)$ (notice that this set is infinite); the initial node $s_0 = (q^{init}, \epsilon, 0)$, also called \emph{the initial configuration}; $S_F$  is the set of \emph{accepting configurations} which are configurations $(q, w, \theta)$ where $q \in F$ and $\theta = |w|$ (signaling reaching an accepting state immediately after a match); the transition relation $\xra{}$ is described as follows.  
 
 Let $\rho: (q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ be an outgoing transition from $q$. There is a transition:
 \begin{align*}
@@ -105,10 +109,14 @@ There is a transition of the form:
 \end{align*}
 if no transition out of $q$ matches the resulting tape configuration $(wa, \theta)$. 
 
-A configuration $(q, w, \theta)$ is accepting if $q \in F$ and $\theta = |w|$. 
+The transition relation $\xra{}$ of $\Ss^\Aa$ is a union over all $\xra[u_1 \parallel u_2 \parallel \cdots \parallel u_k]{a}$ and $\xra{a}$.
+
+%A configuration $(q, w, \theta)$ is accepting if $q \in F$ and $\theta = |w|$. 
+
+\paragraph*{Examples.} For all examples described in Section~\ref{sec:challenges}, the above semantics of transitions adheres to the required intention. 
 
 \begin{remark}
-We remark that the labeled transition system defined as above is non-deterministic. In order to make it deterministic, a specific priority function can be added. If multiple transitions match at a configuration, the priority function can be used to resolve the non-determinism.
+We remark that the labeled transition system $\Ss^\Aa$ defined as above is non-deterministic, since multiple transitions can be enabled at $(q, w, \theta)$ on seeing an $a$. In order to make it deterministic, a specific priority function can be added. If multiple transitions match at a configuration, the priority function can be used to resolve the non-determinism.
 \end{remark}
 
 %Given a tape content $T$ and position $i \in \Nat$, we write $T(i)$ for the letter in the $i^{th}$ position of the tape. For two indices $i, j$ we write $T[i, j]$ to denote the substring $T(i) T(i+1) \cdots T(j)$ of the tape $T$. We will write $|T|$ to denote the length of the tape.
