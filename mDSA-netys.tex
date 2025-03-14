@@ -17,6 +17,8 @@
 \usepackage{graphicx}
 \usepackage{thmtools}
 \usepackage{thm-restate}
+\usepackage{array}
+\usetikzlibrary{automata, positioning, arrows}
 
 \title{An automaton model to succinctly represent suffix-based specifications of a distributed system}
 
@@ -45,7 +47,13 @@
   \newcommand{\sigmaout}{\Sigma_{\mathsf{Out}}}
   \newcommand{\Ss}{\mathbb{TS}}
   \newcommand{\Bb}{\mathcal{B}}
-  
+  \newcommand{\Tt}{\mathcal{T}}
+  \newcommand{\Ii}{\mathcal{I}}
+  \newcommand{\Vv}{\mathcal{V}}
+  \newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\var}{\operatorname{Var}}
+\newcommand{\dom}{\ensuremath{dom}}
   \begin{document}
   
   \maketitle
@@ -70,7 +78,11 @@
 
   \input{complexity.tex}
 
-  \section{Experiments? and Conclusion}
+  \input{edt.tex}
+
+  %\section{Experiments and Conclusion}
+
+  \input{experiments}
 
   \bibliographystyle{plain}
   \bibliography{mDSA-netys.bib}

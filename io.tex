@@ -22,7 +22,35 @@ q \xra[~~O_1: b_1 \parallel O_2: b_2 \parallel \cdots \parallel O_m: b_m~~]{I_1:
 \end{align*}
 where $q, q'$ are states; each $u_j$ is a word in the port alphabet of $I_j$; and each $b_j$ is a letter in the port alphabet of $O_j$. We remark that $\{I_1, \dots, I_k\} \cap \{O_1, \dots, O_m\}$ may be non-empty. In other words, some of the ports may appear both as input and output in a transition.  
 
-\paragraph*{Semantics.} Configurations of an mDSA-with-outputs are the same: $(q, w, \theta)$ with $q$ a state, $w$ the word seen so far 
+\paragraph*{Semantics.} Configurations of $\Bb$ are the same as before, given by $(q, w, \theta)$ with $q$ a state, $w$ the word seen so far and $\theta$ a position of the tape head. The semantics is a transition system $\Ss^\Bb = (S, s_0, \xra{}, F)$ where $S$ is the set of configurations, $s_0$ the initial configuration $(q^{init}, \epsilon, 0)$, $S_F$ the accepting configurations which are $(q, w, \theta)$ with $q \in F$ and $\theta = |w|$. There are three kinds of transitions. Let $\rho$ be a transition $(q, (I_1: u_1 \parallel \cdots I_\ell:u_\ell), (O_1: b_1 \parallel \cdots \parallel O_m: b_m), q')$.
+\begin{itemize}
+\item $(q, w, \theta) \xra[\rho]{\epsilon} (q', wb_1 b_2 \dots b_m, |w|)$ if the input condition $I_1:u_1 \parallel \cdots \parallel I_\ell:u_\ell$ matches the tape configuration $(w, \theta)$; in that case move the tape head to end of $w$ and write all the outputs to the right of $w$ (order of writing does not matter).
+\item if no outgoing transition matches $(w, \theta)$ then there is no $\epsilon$ transition out of $(q, w, \theta)$ and the mDSA-with-outputs listens to further input letters. We have:
+\begin{itemize}
+\item $(q, w, \theta) \xra[\rho]{a} (q', wab_1 b_2 \dots b_m, |wa|)$ if $I_1:u_1 \parallel \cdots \parallel I_\ell:u_\ell$ matches $(wa, \theta)$; then, move the tape head to the right of $wa$ and write the outputs after that,
+\item $(q, w, \theta) \xra{a} (q', wa, \theta)$ if no transition out of $q$ matches $(w, \theta)$.
+\end{itemize}
+\end{itemize} 
+
+\subsection{Complexity of emptiness checking}
+
+We now look at the problem of checking emptiness of an mDSA-with-outputs: given an mDSA-with-outputs $\Bb$, does there exist a word that reaches an accepting configuration? Without outputs, this problem is simply a graph reachability problem, like in a DFA or a DSA. The presence of outputs makes this problem harder. Here is an example that illuminates this difficulty.
+
+\subsubsection*{$N$-bit counter.} We wish to implement addition of an $N$-bit counter using an mDSA-with-outputs that has $2$ state, $N+1$ ports and $N$ transitions. Suppose $b_{N-1} b_{N-2} \dots b_1 b_0$ are the $N$ bits, with $b_{N-1}$ the most significant bit and $b_0$ the least significant bit. Addition can be implemented using $N$ rules: for $j \in \{0, \dots, N-1\}$
+\begin{itemize}
+\item if $b_j = 0$ and $b_{j-1} = b_{j-2} = \cdots = b_0 = 1$, then change $b_j:= 1$ and $b_{j-1} = b_{j-2} = \cdots = b_0 := 0$
+\end{itemize}
+Starting from $0$ for all bits, there will be exactly one rule that will be applicable each time. Applying the relevant rule each time will lead to $b_{N-1} = b_{N-2} = \cdots = b_0 = 1$.
+
+To model this counter using an mDSA-with-outputs, we can use $N$ ports $b_{N-1}, b_{N-2}, \dots, b_0$ each having two values $\{0, 1\}$ and one additional port $I = \{ \checkmark, \times \}$ denoting an alphabet with two actions. We want to accept the single word $(\checkmark)^{2^N}$. The mDSA-with-outputs $\Bb^N$ has states $\{q_0, f\}$ and has the following transition for $j\in \{0, \dots, N-1\}$:
+\begin{align*}
+q_0 \quad \xra[~~b_j:1 ~\parallel~ b_{j-1}:0 ~\parallel~ \cdots ~\parallel~ b_0: 0~~]{\checkmark ~\parallel~ b_j:0 ~\parallel~ b_{j-1}:1 ~\parallel~ \cdots ~\parallel~ b_0: 1} \quad q_0
+\end{align*}
+To mark the end of the computation, we add an extra transition from $q_0$ that checks if $b_{N-1}:1 \parallel b_{N-1}:1 \parallel \cdots \parallel b_0:1$ and moves to $f$. State $q_0$ is initial and $f$ is final. The only word accepted by this automaton is $(\checkmark)^{2^N}$. Therefore, the witness for non-emptiness is a word with length exponential in the size of the input automaton. Notice that we have crucially used the ability to have ports that can be used both as inputs and outputs. Without the outputs which get instantaneously updated, we will not be able to count the number of $\checkmark$s. 
+
+We now pin down the complexity of the emptiness problem in mDSA-with-outputs. 
+
+\endinput
 In order to represent Expressive Decision Tables (EDTs) succinctly, we require an additional feature in the automaton -- the presence of output ports and more importantly input/output (IO) ports. When a transition is matched, we also require a certain output to be produced in an output port. Sometimes, these output ports can also be treated as inputs and checked for suffixes in the transition labels. Such ports will be called IO ports. Addition of these special ports enables a clean translation of EDTs to mDSAs. At the same time, as we will see, they make the emptiness problem significantly more complex. 
 
 \subsection{Formal syntax} 
