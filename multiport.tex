@@ -1,16 +1,15 @@
-\section{Extending DSA with multiple ports}
+\section{Extending DSA to accommodate multiple ports}
 
 Consider a special kind of an alphabet
 $\Sigma = \langle \Sigma_1, \Sigma_2, \dots, \Sigma_k \rangle$ such
 that $\Sigma_i \cap \Sigma_j = \emptyset$ for all $i, j \in
 [1..k]$. We will call $\Sigma_i$ as the alphabet of \emph{port} $i$,
-and $\Sigma$ as a \emph{multi-port} alphabet. We
-look at DFAs over such multi-port alphabets. Such DFAs model systems
-that listen to inputs from different processes and perform actions
+and $\Sigma$ as a \emph{multi-port} alphabet. For instance, in the \emph{Car Security System specification} of Section~\ref{sec:intro}, there are three ports: brake, transmission and ignition, with $\Sigma_{\mathsf{brake}} = \{B\}$, $\Sigma_{\mathtt{trm}} = \{ P, D\}$ and $\Sigma_{\mathtt{ig}} = \{ \mathtt{On}, \mathtt{Off} \}$ respectively.  
+
+We look at DFAs over such multi-port alphabets. Such DFAs model properties of systems 
+that listen to inputs from different components and perform actions
 based on them. Sometimes the order in which the system receives its
-inputs from different ports is not relevant.%
-  
-For example, at a state
+inputs from different ports is not relevant. For example, at a state
 $s$, if the system receives $a$ from port 1 and $b$ from port 2, in any
 order, then it has to go to state $t$.  A DFA would model this with
 transitions: $s \xra{a} s_a \xra{b} t$ and $s \xra{b} s_b \xra{a}
@@ -24,9 +23,7 @@ succinctness, for instance $a_1 \parallel a_2 \cdots \parallel a_n$
 stands for all the $n!$ permutations of $a_1$ to $a_n$. We will also
 allow expressions of the form $a_1 a_2 \parallel b$, which stands for
 the set of words $\{a_1 a_2 b, a_1 b a_2, b a_1 a_2\}$ which shuffles
-$a_1a_2$ and $b$. We will now formalize this idea by enhancing DSA with
-the $\parallel$ operator and then consider the problem of synthesizing
-such extended DSA. We begin with some notation.%
+$a_1a_2$ and $b$. Section~\ref{sec:intro} illustrates further examples of the use of $\parallel$ operator in Figure~\ref{fig:mdsa-examples}. We will now formalize this idea.  We begin with some notation.%
 
 \paragraph*{Notation.} For a word $w \in \Sigma^*$, we write
 $\proj{i}(w)$ for the projection of $w$ onto the set $\Sigma_i$. For
@@ -41,49 +38,100 @@ $w_2$ have the same order of events within each port, but could have a
 different ordering between letters from different ports.%
 
 
-\paragraph*{Challenges in extending to multiport.} In a DSA, each configuration maintained the current state $q$ and the word $w$ seen after reaching $q$. This was sufficient to determine whether an outgoing transition matches. In the concurrent case, we would like our transition labels to be of the form $u_1 \parallel u_2 \parallel \cdots \parallel u_k$, with the intention that each $u_i$ is a suffix of the projection $\proj{i}(w)$. This is a natural extension so far. However, suppose a transition matches. In the DSA, we simply consume the word and go to a new configuration $(q', \epsilon)$. What is the counterpart in the concurrent case? One option is to consume the word, again, in all the ports. This is unsatisfactory: suppose the rule talks only about ports $1$ and $2$, while in state $q$ we have been receiving signals on port $3$ as well, on firing the rule, we may reach a state that depends on the signals on port $3$ received previously. Therefore, we do not want to consume the sequences seen in ports outside the fired rule. For similar reasons, sometimes we do not want to consume the letters even in the ports present in the rule. Here is an example (\textcolor{red}{TODO}). 
+\paragraph*{Challenges in extending to multiport.} For a DSA, a configuration was given by $(q, w)$ where $q$ is the current state and $w$ is the word seen after reaching $q$. Moreover, if a transition matches, the DSA moves to a configuration $(q', \epsilon)$ by fully consuming the word seen so far. Now consider the car security system example (Figure~\ref{fig:mdsa-examples} (a)) . On receiving inputs $P;B;\mathtt{On}$, the automaton moves to $\mathtt{Started}$ state, signaling that the car has started:
+If the brake remains pressed and the transmission is moved to park, we would like the car to go into the drive mode. Therefore, on the word $P;B;\mathtt{On};D$, the automaton should go to the $\mathtt{Drive}$ state. This intention is summarized below as what we require as the run of the automaton:
+\begin{align*}
+  \mathtt{Off} \quad \xra{P;B;\mathtt{On}} \quad \mathtt{Started} \quad \xra{D} \quad \mathtt{Drive}
+  \end{align*} 
+ If we had consumed the prefix $P;B;\mathtt{On}$ while moving to the $\mathtt{Started}$ state, then the transition $B \parallel D$ would not match anymore, since there is no $B$ after reaching $\mathtt{Started}$. What we really need is that: the last seen input in the brake port is $B$ and the last seen input in the transmission port is $D$. Therefore, one option is to simply not consume any letters and say that a transition $u_1 \parallel u_2 \parallel \cdots \parallel u_k$ matches a word $w$ if $u_i$ is a suffix of projection $\proj{i}(w)$. However, this creates other problems as we will now illustrate. 
+ 
+ Consider the smartphone lock pattern specification (Figure~\ref{fig:mdsa-examples} (b)). On a word $F; T_1; T_2; T_3; \mathtt{Press}$, the phone is unlocked and the automaton goes to the $\mathtt{PhoneOn}$ state. At this state, there is an outgoing transition that listens to $\mathtt{Press}$. If we do not consume the word seen so far, the last seen input in the button port is still $\mathtt{Press}$, and hence the automaton would go back to the $\mathtt{PhoneOn}$ state without seeing additional inputs. In fact, this looping behaviour would continue forever, with no inputs seen. Therefore, for the outgoing transition $\mathtt{Press}$ in the $\mathtt{PhoneOn}$ state, the intention is that we need to receive a fresh signal $\mathtt{Press}$.  
+ 
+ To summarize: on a transition match, we do not want to consume the word seen so far (car security specification example); but simply not consuming the word leads to problems (smartphone lock pattern example). In the following, we adopt an intermediate approach, where we mark the position $\theta$ in the word where the last transition matched. For a new transition $u_1 \parallel u_2 \parallel \cdots \parallel u_k$ to match, in addition to having each $u_i$ as a suffix of $\proj{i}(w)$, we require at least one $u_i$ to appear entirely after the marked position $\theta$. We include an additional condition that every $u_i$ appears either entirely to the left of $\theta$ or to the right of $\theta$ to account for such examples: 
+ \begin{align*}
+  s_0 \xra{c \parallel a} s_1 \xra{cc \parallel b}s_2
+ \end{align*}
+ Action $c$ can denote a \texttt{click}. So, the pattern $cc$ denotes a double click. On seeing $a; c$ the automaton moves to $s_1$. Now if the inputs received are $b; c$, we do not want the transition $cc \parallel b$ to match. Instead, we want two clicks and a $b$ after the last match, which is the prefix $a; c$. The condition that every pattern appears entirely after this match, or entirely before this match takes care of all the situations we have explained so far.
+ 
 
-To cater to these different situations, we equip the automaton with multiple tape heads. Each tape head points to a position in the word seen so far. The rules can then specify the tape head since when the pattern is required to be true. Here is an example (\textcolor{red}{TODO}).
 
-\paragraph*{Formal definition.} In multiport DSAs, the transition are labeled with a richer syntax. They make use of a parallel operator $\parallel$ and also specify a tape head.
+%In a DSA, each configuration maintained the current state $q$ and the word $w$ seen after reaching $q$. This was sufficient to determine whether an outgoing transition matches. In the concurrent case, we would like our transition labels to be of the form $u_1 \parallel u_2 \parallel \cdots \parallel u_k$, with the intention that each $u_i$ is a suffix of the projection $\proj{i}(w)$. This is a natural extension so far. However, suppose a transition matches. In the DSA, we simply consume the word and go to a new configuration $(q', \epsilon)$. What is the counterpart in the concurrent case? One option is to consume the word, again, in all the ports. This is unsatisfactory: suppose the rule talks only about ports $1$ and $2$, while in state $q$ we have been receiving signals on port $3$ as well, on firing the rule, we may reach a state that depends on the signals on port $3$ received previously. Therefore, we do not want to consume the sequences seen in ports outside the fired rule. For similar reasons, sometimes we do not want to consume the letters even in the ports present in the rule. Here is an example (\textcolor{red}{TODO}). 
+
+%To cater to these different situations, we equip the automaton with multiple tape heads. Each tape head points to a position in the word seen so far. The rules can then specify the tape head since when the pattern is required to be true. Here is an example (\textcolor{red}{TODO}).
+
+\paragraph*{Formal definition.} We first describe the formal syntax and then proceed to an operational semantics given by a labeled transition system.
 
 \begin{definition} Let
   $\Sigma = \langle \Sigma_1, \Sigma_2, \dots, \Sigma_k \rangle$ be a
   multi-port alphabet. A \emph{multi-port (deterministic)
     suffix-reading automaton} (written mDSA in short) $\Aa$ is a
-  tuple $(Q, \Sigma, L, q^{init}, \delta, \pi, F)$ where $Q$, $q^{init}$ and
+  tuple $(Q, \Sigma, q^{init}, \delta, F)$ where $Q$, $q^{init}$ and
   $F$ are a finite set of states, the initial state and a set of
-  accept states, respectively; $L = \{\lt_1, \lt_2, \dots, \lt_p\}$ denotes a set of tape heads. The transition relation
-  $\delta \incl Q \times (L \times\Sigma_1^* \times \Sigma_2^* \times \cdots
-  \times \Sigma_k^*) \times Q$: each transition is of the form
-  $(q, (\lt_j: u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ where
-  $u_i \in \Sigma_i^*$ (not all of them can be $\epsilon$) and $\lt_j$ is a tape head of $L$. We assume there are only finitely many transitions. The \emph{priority function} $\pi$ gives a total order on the set of transitions. 
+  accept states, respectively. %$L = \{\lt_1, \lt_2, \dots, \lt_p\}$ denotes a set of tape heads. 
+  The transition relation
+  $\delta \incl Q \times \Sigma_1^* \times \Sigma_2^* \times \cdots
+  \times \Sigma_k^* \times Q$: each transition is of the form
+  $(q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ where
+  $u_i \in \Sigma_i^*$ (not all of them can be $\epsilon$)%and $\lt_j$ is a tape head of $L$. 
+  We assume there are only finitely many transitions. %The \emph{priority function} $\pi$ gives a total order on the set of transitions. 
  \end{definition}%
+Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is an example to illustrate the syntax of an mDSA. \textcolor{red}{(TODO)}.
 
- Here is an example to illustrate the syntax of an mDSA. \textcolor{red}{(TODO)}.
+ For the semantics, it is convenient to assume that there is a \emph{tape} on which the automaton writes all its inputs. Initially, the tape is $\epsilon$. Each time an input letter $a \in \Sigma$ is received, the automaton appends it to the right of the tape. 
+ For a word $w = a_1 \dots a_{n}$, with $a_i \in \Sigma$, we write $w(i)$ to denote the letter $a_i$. The length $|w|$ equals $n$, the number of letters. For $j \in \{0, \dots, n-1\}$ we write $w[i, j]$ to denote the substring $a_i a_{i+1} \dots a_j$.
+  %The $p$ tape heads $\lt_1, \lt_2, \dots, \lt_p$ point to various positions in the tape. A \emph{tape configuration} is therefore given as $(T, i_1, i_2, \dots, i_p)$ where $T$ is the current word in the tape, and $i_1, \dots, i_p \in \Nat$ are the positions pointed to by the heads $\lt_1, \dots, \lt_p$ respectively. A \emph{configuration} of an mDSA is then given by a state $q$ and a tape configuration: $(q, T, i_1, \dots, i_p)$. 
 
- For the semantics, we assume that there is a tape on which the automaton writes all its inputs. Initially, the tape is $\epsilon$. Each time an input letter $a \in \Sigma$ is received, the automaton appends it to the right of the tape. The $p$ tape heads $\lt_1, \lt_2, \dots, \lt_p$ point to various positions in the tape. A \emph{tape configuration} is therefore given as $(T, i_1, i_2, \dots, i_p)$ where $T$ is the current word in the tape, and $i_1, \dots, i_p \in \Nat$ are the positions pointed to by the heads $\lt_1, \dots, \lt_p$ respectively. A \emph{configuration} of an mDSA is then given by a state $q$ and a tape configuration: $(q, T, i_1, \dots, i_p)$. 
+  A \emph{configuration} of an mDSA is given by $(q, w, \theta)$ where
+  \begin{itemize}
+  \item $q$ is the current state,
+  \item $w$ is the word read so far, from the beginning
+  \item $\theta \in \Nat$ marks a position in the word where the last match of a transition appeared.  
+  \end{itemize} 
+  The formal semantics of an mDSA is given by a transition system over the configurations. The initial configuration is $(q^{init}, \epsilon, 0)$. The transition relation is given as follows.
 
-Given a tape content $T$ and position $i \in \Nat$, we write $T(i)$ for the letter in the $i^{th}$ position of the tape. For two indices $i, j$ we write $T[i, j]$ to denote the substring $T(i) T(i+1) \cdots T(j)$ of the tape $T$. We will write $|T|$ to denote the length of the tape.
-
-A transition $(q, \lt_j: u_1 \parallel u_2 \parallel \cdots \parallel u_k, q')$ matches  $(q, T, i_1, i_2 \dots, i_p)$ if
+Let $\rho: (q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ be an outgoing transition from $q$. There is a transition:
+\begin{align*}
+ (q, w, \theta) \xra[~u_1 \parallel u_2 \parallel \cdots \parallel u_k~]{a} (q', wa, \theta') \qquad \text{if}
+\end{align*}
 \begin{itemize}
-\item $u_i$ is a suffix of $\proj{i}(T)$ for all ports $i$,
-\item at least one $u_i$ occurs entirely after the tape head $\lt$: that is, $u_i$ is a subword of the word $T(i_{j}+1, |T|]$.
-\end{itemize} 
-
-Here are some examples to illustrate this definition. \textcolor{red}{(TODO)}
-
-The formal semantics of an mDSA is given by a transition system over the configurations. The initial configuration is $(q^{init}, \vdash, 0, 0, \dots,0)$ where $\vdash$ represents a special symbol denoting the beginning of the tape (in other words, the position $0$ in the tape). All the tape heads are initially at position $0$. 
-From a configuration $(q, T, i_1, \dots, i_p)$, on receiving a letter $a$, there are two possible transitions: 
-\begin{itemize}
-  \item $(q, T, i_1, \dots, i_p) \xra{a} (q, Ta, i_1, \dots, i_p)$, if no transition out of $q$ matches the resulting configuration $(q, Ta, i_1, \dots, i_p)$,
-  \item $(q, T, i_1, \dots, i_p) \xra[\rho]{a} (q', T a, i'_1, i'_2, \dots, i'_p)$ if $\rho: (q, \lt_j: u_1 \parallel u_2 \parallel \cdots \parallel u_k)$ is the transition out of $q$ with the highest priority $\pi$, that matches $(q, Ta, i_1, \dots, i_p)$; moreover, $i'_j = |T a|$ (tape head $\lt_j$ moves to the end of the tape), and $i'_{m} = i_m$ for all other $m$ (other tape heads remain in their position).
+  \item $u_i$ is a suffix of $\proj{i}(wa)$ for all ports $i$,
+  \item each $u_i$ appears entirely before or entirely after $\theta$: that is, $u_i$ is a subword of $w[0, \theta]$ or $w[\theta+1, |w|-1]$,
+  \item at least one $u_i$ appears entirely after $\theta$, and
+  \item $\theta' = |w|$ (tape head moves to the end of the word on a match).
 \end{itemize}
+There is a transition of the form:
+\begin{align*}
+  (q, w, \theta) \xra{a} (q, wa, \theta)
+\end{align*}
+if no transition out of $q$ matches the resulting tape configuration $(wa, \theta)$. 
 
-Here are some examples to illustrate the full mechanics of an mDSA \textcolor{red}{(TODO)}.
+A configuration $(q, w, \theta)$ is accepting if $q \in F$ and $\theta = |w|$. 
 
-A configuration $(q, T, i_1, \dots, i_k)$ is said to be accepting if $q \in F$ and at least one of the tape heads is in the final position $|T|$. From a technical viewpoint, this definition of accepting configurations allows us to extend DSAs. Moreover, if we think of accepting states to denote some errors, this definition ensures that as soon as a rule leading to an error is triggered, it will be accepted. \textcolor{red}{Cleaner to change to acceptance on transitions?}
+\begin{remark}
+We remark that the labeled transition system defined as above is non-deterministic. In order to make it deterministic, a specific priority function can be added. If multiple transitions match at a configuration, the priority function can be used to resolve the non-determinism.
+\end{remark}
+
+%Given a tape content $T$ and position $i \in \Nat$, we write $T(i)$ for the letter in the $i^{th}$ position of the tape. For two indices $i, j$ we write $T[i, j]$ to denote the substring $T(i) T(i+1) \cdots T(j)$ of the tape $T$. We will write $|T|$ to denote the length of the tape.
+
+%A transition $(q, \lt_j: u_1 \parallel u_2 \parallel \cdots \parallel u_k, q')$ matches  $(q, T, i_1, i_2 \dots, i_p)$ if
+%\begin{itemize}
+%\item $u_i$ is a suffix of $\proj{i}(T)$ for all ports $i$,
+%\item at least one $u_i$ occurs entirely after the tape head $\lt$: that is, $u_i$ is a subword of the word $T(i_{j}+1, |T|]$.
+%\end{itemize} 
+
+%Here are some examples to illustrate this definition. \textcolor{red}{(TODO)}
+
+
+%$\vdash$ represents a special symbol denoting the beginning of the tape (in other words, the position $0$ in the tape). All the tape heads are initially at position $0$. 
+%From a configuration $(q, T, i_1, \dots, i_p)$, on receiving a letter $a$, there are two possible transitions: 
+%\begin{itemize}
+  %\item $(q, T, i_1, \dots, i_p) \xra{a} (q, Ta, i_1, \dots, i_p)$, if no transition out of $q$ matches the resulting configuration $(q, Ta, i_1, \dots, i_p)$,
+  %\item $(q, T, i_1, \dots, i_p) \xra[\rho]{a} (q', T a, i'_1, i'_2, \dots, i'_p)$ if $\rho: (q, \lt_j: u_1 \parallel u_2 \parallel \cdots \parallel u_k)$ is the transition out of $q$ with the highest priority $\pi$, that matches $(q, Ta, i_1, \dots, i_p)$; moreover, $i'_j = |T a|$ (tape head $\lt_j$ moves to the end of the tape), and $i'_{m} = i_m$ for all other $m$ (other tape heads remain in their position).
+%\end{itemize}
+
+%Here are some examples to illustrate the full mechanics of an mDSA \textcolor{red}{(TODO)}.
+
+%A configuration $(q, T, i_1, \dots, i_k)$ is said to be accepting if $q \in F$ and at least one of the tape heads is in the final position $|T|$. From a technical viewpoint, this definition of accepting configurations allows us to extend DSAs. Moreover, if we think of accepting states to denote some errors, this definition ensures that as soon as a rule leading to an error is triggered, it will be accepted. \textcolor{red}{Cleaner to change to acceptance on transitions?}
 
 \subsection{DSA is a special mDSA.}
 
