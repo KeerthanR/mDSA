@@ -5,8 +5,8 @@
 Expressive Decision Tables (EDTs)~\cite{DBLP:conf/date/VenkateshSKA14} are a tabular
 notation for specifying software requirements and have been used in various
 industrial settings~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}.  An EDT specification consists
-of a tables where columns specify input, output and input/output (I/O) ports, and rows specify the relationship between input and output
-values on these ports. Each port is associated with an alphabet and each cell in a table consists of a string of letters from this alphabet.% with discrete
+of tables where columns specify input, output and input/output (I/O) ports, and rows specify the relationship between input and output
+values on these ports. Each port is associated with an alphabet and each cell in the table consists of a string of letters from this alphabet.% with discrete
 The original work on EDTs contained timing constraints in the cells and interpreted the EDT over a notion of discrete-time. In this paper we consider EDT without time. A cell in  an EDT table
 is said to match when the string given in that cell is a suffix of the values seen for the
 input port corresponding to that cell's column. A row of an EDT matches when
@@ -57,11 +57,11 @@ algorithms from EDT specifications have been widely studied.
 ~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}. However, the notation lacks a rigorous
 formal semantics, except for a brief description of key elements of formal
 semantics in~\cite{DBLP:conf/date/VenkateshSKA14}. Hence, none of the test case algorithms use
-formal techniques like model checking and instead rely in random generation
+formal techniques like model checking and instead rely on random generation
 using heuristics. These algorithms, therefore, cannot prove that an EDT row
 cannot be matched and also find it hard to match certain rows. We overcome both
 these limitations by providing a formal semantics for EDTs (without timing)
-through a translation to mDSA.
+through a translation to mDSA-with-outputs.
 %When certain requirements do not get covered, a manual 
 % As we will show in this paper, the mechanics of
 %EDTs is intricate due to various interactions between the rows. An
@@ -72,9 +72,9 @@ through a translation to mDSA.
 \subsection{Translating EDT to mDSA-with-outputs}
 
 An EDT with $C$ columns and $R$ rows is translated to an mDSA, with one
-state $q_0$ and an alphabet $\Sigma = \langle \Sigma_1 \cdots \Sigma_|C| \rangle$.
+state $q_0$ and an alphabet $\Sigma = \langle \Sigma_1 \cdots \Sigma_{|C|} \rangle$.
 Each $\Sigma_i$ corresponds to the port of column $i$ and the
-letters of the alphabet correspond to the values that the signal can take.
+letters of the alphabet correspond to the values that the signal can take,
 prefixed by $\langle Portname: \rangle$. 
 Thus if the Port name of the first
 column is $A$ and its alphabet is ${ a_1, a_2, \cdots, a_k}$ then the
