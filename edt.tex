@@ -5,16 +5,15 @@
 Expressive Decision Tables (EDTs)~\cite{DBLP:conf/date/VenkateshSKA14} are a tabular
 notation for specifying software requirements and have been used in various
 industrial settings~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}.  An EDT specification consists
-of several tables where columns specify input, output and input/output (I/O) or
-local ports, and rows specify the relationship between input and output
-values on these ports. Each port is associated with an alphabet and each cell in a table consists of a string of letters from this alphabet with discrete
-time. In this paper we consider EDT without time. A cell in  an EDT table
-is said to match when the string given in that cell is a subscript of the values seen for the
+of a tables where columns specify input, output and input/output (I/O) ports, and rows specify the relationship between input and output
+values on these ports. Each port is associated with an alphabet and each cell in a table consists of a string of letters from this alphabet.% with discrete
+The original work on EDTs contained timing constraints in the cells and interpreted the EDT over a notion of discrete-time. In this paper we consider EDT without time. A cell in  an EDT table
+is said to match when the string given in that cell is a suffix of the values seen for the
 input port corresponding to that cell's column. A row of an EDT matches when
 all the cells corresponding to that row match and one cell matches on the last
-input.  Table~\ref{tab:edt-alarm} gives an example, adapted from
-\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}, specifying a subset of requirements of a car alarm
-module.
+input.  Table~\ref{tab:edt-alarm} gives the EDT specification of the Car Alarm module described in the beginning of Section~\ref{sec:multiport-outputs}. We write $F$ for \texttt{On} and \texttt{False}, $P$ for \texttt{Press} and $R$ for \texttt{Release}. %an example, adapted from
+%\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}, specifying a subset of requirements of a car alarm
+%module.
 
 \newcolumntype{A}{>{\centering}p{1cm}}
 \begin{table}[h!]
@@ -25,7 +24,7 @@ module.
     \hline
     s.no & in  I & in  P & in A & out  A & out  F \\
 	 \hline
-    1 & F & P;P & F& N & I \\
+    1 & F & P;P & F& N & \\
     \hline
     2 & & R;R;R & N & F & F \\
     \hline
@@ -35,25 +34,25 @@ module.
   
 \end{table}
 In the example EDT the input ports are prefixed with 
-\emph{in} and output ports are prefixed with \emph{out}. Input/Output ports are prefixed with both \emph{in} and \emph{out}.
-The EDT of
-Table~\ref{tab:edt-alarm} specifies the
-following requirements:
-\begin{enumerate}
-	\item If the most recent values on Ports \emph{I} (Ignition) and \emph{A} (Alarm) are \emph{F}(Off), and
-		the last two values on the Port \emph{P} are $P;P$ (Press), then
-		the value \emph{N}(On) is output on the port \emph{A}.
+\emph{in} and output ports are prefixed with \emph{out}. Input/Output ports are prefixed with both \emph{in} and \emph{out}. These are the ports that appear on both sides of the EDT, as inputs as well as outputs. 
+%The EDT of
+%Table~\ref{tab:edt-alarm} specifies the
+%following requirements:
+%\begin{enumerate}
+%	\item If the most recent values on Ports \emph{I} (Ignition) and \emph{A} (Alarm) are \emph{F}(Off), and
+%		the last two values on the Port \emph{P} are $P;P$ (Press), then
+%		the value \emph{N}(On) is output on the port \emph{A}.
 
-\item If the last three values on Port \emph{P} are
-	$R;R;R$ (Release), and the last value for \emph{A} is \emph{N}, then output the value \emph{F} (False) on \emph{F}
-		and output \emph{F} on \emph{A}.
+%\item If the last three values on Port \emph{P} are
+%	$R;R;R$ (Release), and the last value for \emph{A} is \emph{N}, then output the value \emph{F} (False) on \emph{F}
+%		and output \emph{F} on \emph{A}.
 
-	\item If last value on \emph{I} is \emph{N}, then \emph{F} is output on \emph{F} 
-		and \emph{F} is output on \emph{A}.
-\end{enumerate}
+%	\item If last value on \emph{I} is \emph{N}, then \emph{F} is output on \emph{F} 
+%		and \emph{F} is output on \emph{A}.
+%\end{enumerate}
 
-A test case for a requirement is a sequence of Port values  that match the
-EDT row for that requirement. The use of EDTs and test case generation
+A \emph{test case} for a requirement is a sequence of values  that match the
+EDT row corresponding to that requirement. The use of EDTs and test case generation
 algorithms from EDT specifications have been widely studied.
 ~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}. However, the notation lacks a rigorous
 formal semantics, except for a brief description of key elements of formal
@@ -70,7 +69,7 @@ through a translation to mDSA.
 %non-coverability is indispensable. To achieve this, the first step is
 %to have a formal operational semantics for EDT.
 
-\subsection{Translating EDT to mDSA}
+\subsection{Translating EDT to mDSA-with-outputs}
 
 An EDT with $I$ input columns and $R$ rows is translated to an mDSA, with one
 state $q$ and an alphabet $\Sigma = \langle \Sigma_1 \cdots \Sigma_I \rangle$.
