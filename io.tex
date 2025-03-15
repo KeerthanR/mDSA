@@ -15,7 +15,7 @@ The first requirement checks for $I:\mathtt{Off} \parallel A:\mathtt{Off} \paral
 
 \subsection{mDSA-with-outputs: formal syntax and semantics}
 \label{sec:mdsao-synt}
-The syntax of mDSA-with-outputs is almost the same as that of mDSAs. The only difference is in the syntax of transitions.  As before, there is a multiport alphabet $\Sigma = \langle \Sigma_1, \dots, \Sigma_k \rangle$. An mDSA-with-outputs $\Bb$ is a tuple $(Q, \Sigma, q^{init}, \delta)$ where $Q$ is a finite set of states, $q^{init}$ is the initial state and $\delta$ is a finite set of transitions. We do not view these automata as language acceptors, and so we do not specifically define accept states. We will later discuss the state reachability problem. 
+The syntax of mDSA-with-outputs is almost the same as that of mDSAs. The only difference is in the syntax of transitions.  As before, there is a multiport alphabet $\Sigma = \langle \Sigma_1, \dots, \Sigma_k \rangle$. An mDSA-with-outputs $\Bb$ is a tuple $(Q, \Sigma, q_0, \delta)$ where $Q$ is a finite set of states, $q_0$ is the initial state and $\delta$ is a finite set of transitions. We do not view these automata as language acceptors, and so we do not specifically define accept states. We will later discuss the state reachability problem. 
 
 \paragraph*{Transitions.} A transition now looks like:
 \begin{align*}
@@ -23,7 +23,7 @@ q \xra[~~O_1: b_1 ~\parallel~ O_2: b_2 ~\parallel~ \cdots ~\parallel~ O_m: b_m~~
 \end{align*}
 where $q, q'$ are states; each $u_j$ is a word in the port alphabet of $I_j$; and each $b_j$ is a letter in the port alphabet of $O_j$. We remark that $\{I_1, \dots, I_k\} \cap \{O_1, \dots, O_m\}$ may be non-empty. In other words, some of the ports may appear both as input and output in a transition.  
 
-\paragraph*{Semantics.} Configurations of $\Bb$ are the same as before, given by $(q, w, \theta)$ with $q$ a state, $w$ the word seen so far and $\theta$ a position of the tape head. The semantics is a transition system $\Ss^\Bb = (S, s_0, \xra{})$ where $S$ is the set of configurations, with $s_0$ being the initial configuration $(q^{init}, \epsilon, 0)$. There are three kinds of transitions. Let $\rho$ be a transition $(q, (I_1: u_1 \parallel \cdots I_\ell:u_\ell), (O_1: b_1 \parallel \cdots \parallel O_m: b_m), q')$.
+\paragraph*{Semantics.} Configurations of $\Bb$ are the same as before, given by $(q, w, \theta)$ with $q$ a state, $w$ the word seen so far and $\theta$ a position of the tape head. The semantics is a transition system $\Ss^\Bb = (S, s_0, \xra{})$ where $S$ is the set of configurations, with $s_0$ being the initial configuration $(q_0$. There are three kinds of transitions. Let $\rho$ be a transition $(q, (I_1: u_1 \parallel \cdots I_\ell:u_\ell), (O_1: b_1 \parallel \cdots \parallel O_m: b_m), q')$.
 \begin{itemize}
 \item \emph{$\epsilon$-transitions.} $(q, w, \theta) \xra[\rho]{~~\epsilon~~} (q', wb_1 b_2 \dots b_m, |w|)$ if the input condition ($I_1:u_1 \parallel \cdots \parallel I_\ell:u_\ell$) matches the tape configuration $(w, \theta)$; in that case move the tape head to end of $w$ and write all the outputs to the right of $w$ (order of writing does not matter).
 \item \emph{transitions on input letters.} if no outgoing transition from $q$ matches the current tape configuration $(w, \theta)$, then there is no $\epsilon$ transition out of $(q, w, \theta)$ and the mDSA-with-outputs listens to further input letters: 
@@ -36,13 +36,13 @@ Notice that the transitions given on input letters are the same as in an mDSA, e
 
 Surprisingly, this ability to produce outputs which can in turn be consumed by input conditions, creates complex behaviours.  We illustrate this additional difficulty by presenting an mDSA-with-outputs that can succinctly encode an $N$-bit counter.
 
-\subsubsection*{$N$-bit counter.} We wish to implement addition of an $N$-bit counter using an mDSA-with-outputs that has $3$ states $\{q^{init}, q_0, f\}$, $N+1$ ports and $\mathcal{O}(N)$ transitions. Suppose $b_{N-1} b_{N-2} \dots b_1 b_0$ are the $N$ bits, with $b_{N-1}$ the most significant bit and $b_0$ the least significant bit. Addition can be implemented using $N$ rules: for $j \in \{0, \dots, N-1\}$
+\subsubsection*{$N$-bit counter.} We wish to implement addition of an $N$-bit counter using an mDSA-with-outputs that has $3$ states $\{q_0$, $N+1$ ports and $\mathcal{O}(N)$ transitions. Suppose $b_{N-1} b_{N-2} \dots b_1 b_0$ are the $N$ bits, with $b_{N-1}$ the most significant bit and $b_0$ the least significant bit. Addition can be implemented using $N$ rules: for $j \in \{0, \dots, N-1\}$
 \begin{itemize}
 \item if $b_j = 0$ and $b_{j-1} = b_{j-2} = \cdots = b_0 = 1$, then change $b_j:= 1$ and $b_{j-1} = b_{j-2} = \cdots = b_0 := 0$
 \end{itemize}
 Starting from $0$ for all bits, there will be exactly one rule that will be applicable each time. Applying the relevant rule each time will lead to $b_{N-1} = b_{N-2} = \cdots = b_0 = 1$ in $2^N - 1$ steps.
 
-To model this counter using an mDSA-with-outputs, we can use $N$ ports $b_{N-1}, b_{N-2}, \dots, b_0$ each having two values $\{0, 1\}$. From the initial state $q^{init}$, we can first read a dummy letter (in a fresh port), write $0$ to all ports $b_{N-1}, \dots, b_0$, and move to state $q_0$. From $q_{0}$ to $q_{0}$, there is a transition for each $j \in \{0, \dots, N-1\}$ in the following form: 
+To model this counter using an mDSA-with-outputs, we can use $N$ ports $b_{N-1}, b_{N-2}, \dots, b_0$ each having two values $\{0, 1\}$. From the initial state $q_0$, we can first read a dummy letter (in a fresh port), write $0$ to all ports $b_{N-1}, \dots, b_0$, and move to state $q_0$. From $q_{0}$ to $q_{0}$, there is a transition for each $j \in \{0, \dots, N-1\}$ in the following form: 
 \begin{align*}
 q_0 \quad \xra[~~b_j:1 ~\parallel~ b_{j-1}:0 ~\parallel~ \cdots ~\parallel~ b_0: 0~~]{ b_j:0 ~\parallel~ b_{j-1}:1 ~\parallel~ \cdots ~\parallel~ b_0: 1} \quad q_0
 \end{align*}
@@ -66,7 +66,7 @@ Below, we detail each element in the syntax of mDSA-with-outputs.
 
 \paragraph*{Tape heads.} The automaton is equipped with a set $L = \{ \lt_1, \lt_2, \dots, \lt_p\}$ of tape heads. 
 
-\paragraph*{States.} States of an mDSA are now partitioned into two kinds: \emph{read states} which are the usual kind of states that receive inputs and match transitions, and \emph{write states} which simply write new values to (some of) the IO and output ports. In pictures, we represent read states using circles and write states using squares. We denote by $Q_r$ and $Q_w$ the set of read states and write states respectively. There is an initial state $q^{init}$ which could be either a read or a write state. 
+\paragraph*{States.} States of an mDSA are now partitioned into two kinds: \emph{read states} which are the usual kind of states that receive inputs and match transitions, and \emph{write states} which simply write new values to (some of) the IO and output ports. In pictures, we represent read states using circles and write states using squares. We denote by $Q_r$ and $Q_w$ the set of read states and write states respectively. There is an initial state $q_0$ which could be either a read or a write state. 
 
 \paragraph*{Transitions.} Transitions out of read states $q$ look the same as before: $(q, (\lt: u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ where $q'$ could be any state (read/write) and each $u_j$ is a word in some $(\Sigma^i_\ell)^*$ (input port) or $(\Sigma^{io}_\ell)^*$ (IO port).  We assume that not all $u_j$ are $\epsilon$. As before, $\lt$ denotes a tape head. 
 

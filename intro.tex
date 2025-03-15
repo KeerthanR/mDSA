@@ -124,7 +124,13 @@
    
   In Appendix~\ref{app:examples-of-parallel}, we give many more examples of similar situations that involve multiple ports and suffix-based requirements across all of them. To the best of our knowledge, no automaton model can represent such specifications succinctly. Incorporating concurrency into the specification is paramount when requirements talk about different components of the distributed system. 
   
-  \subsubsection*{Contributions.} The goal of this paper is to investigate the addition of a $\parallel$ operator into the transition syntax of DSAs. We call the resulting model as \emph{multi-port DSAs}, where the alphabet is distributed (partitioned) across multiple ports. The challenge lies in describing an operational semantics that matches with our intentions. As our first technical contribution, we provide a formal operational semantics for multi-port DSAs. 
+  \subsubsection*{Contributions.} The goal of this paper is to investigate the
+  addition of a $\parallel$ operator coupled with output to ports into the
+  transition syntax of DSAs. We call the resulting model as \emph{multi-port
+  DSAs}, where the alphabet is distributed (partitioned) across multiple ports.
+  The challenge lies in describing an operational semantics that matches with
+  our intentions. As our first technical contribution, we provide a formal
+  operational semantics for multi-port DSAs. 
   
   We then show that state reachability (or emptiness) for mDSAs is PSPACE-complete. For the simpler models DFAs or DSAs, reachability is linear in the input size. The higher complexity for mDSAs ties with the intuition that mDSAs can be exponentially more succinct. Our proof of PSPACE-hardness indeed exhibits such an example. 
 

@@ -69,7 +69,7 @@ We first describe the formal syntax and then proceed to an operational semantics
   $\Sigma = \langle \Sigma_1, \Sigma_2, \dots, \Sigma_k \rangle$ be a
   multi-port alphabet. A \emph{multi-port (deterministic)
     suffix-reading automaton} (written mDSA in short) $\Aa$ is a
-  tuple $(Q, \Sigma, q^{init}, \delta, F)$ where $Q$, $q^{init}$ and
+  tuple $(Q, \Sigma, q_0, \delta, F)$ where $Q$, $q_0$ and
   $F$ are a finite set of states, the initial state and a set of
   accept states, respectively. %$L = \{\lt_1, \lt_2, \dots, \lt_p\}$ denotes a set of tape heads. 
   The transition relation
@@ -93,7 +93,7 @@ Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is
   \end{itemize} 
   We refer to the pair $(w, \theta)$ as the \emph{tape configuration}.
   
-  The formal semantics of an mDSA $\Aa$ is given by a transition system $\Ss^\Aa = (S, S_0, \xra{}, S_F)$  over the configurations: the set of nodes $S$ is  the set of all configurations $(q, w, \theta)$ (notice that this set is infinite); the initial node $s_0 = (q^{init}, \epsilon, 0)$, also called \emph{the initial configuration}; $S_F$  is the set of \emph{accepting configurations} which are configurations $(q, w, \theta)$ where $q \in F$ and $\theta = |w|$ (signaling reaching an accepting state immediately after a match); to describe the transition relation $\xra{}$, we first explain when a transition label matches with a tape configuration. 
+  The formal semantics of an mDSA $\Aa$ is given by a transition system $\Ss^\Aa = (S, S_0, \xra{}, S_F)$  over the configurations: the set of nodes $S$ is  the set of all configurations $(q, w, \theta)$ (notice that this set is infinite); the initial node $s_0 = (q_0, \epsilon, 0)$, also called \emph{the initial configuration}; $S_F$  is the set of \emph{accepting configurations} which are configurations $(q, w, \theta)$ where $q \in F$ and $\theta = |w|$ (signaling reaching an accepting state immediately after a match); to describe the transition relation $\xra{}$, we first explain when a transition label matches with a tape configuration. 
 
   \begin{definition}\label{def:match}
     We say that a transition label $(u_1 \parallel u_2 \parallel \cdots \parallel u_k)$ matches a tape configuration $(w, \theta)$ if:
