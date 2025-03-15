@@ -1,9 +1,9 @@
 \label{sec:edt}%
 
 \section{Expressive decision tables}
-Expressive Decision Tables (EDTs)~\cite{Venkatesh:DATE:2014} are a tabular
+Expressive Decision Tables (EDTs)~\cite{DBLP:conf/date/VenkateshSKA14} are a tabular
 notation for specifying software requirements and have been used in various
-industrial settings~\cite{Venkatesh:ENASE:2015}.  An EDT specification consists
+industrial settings~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}.  An EDT specification consists
 of several tables where columns specify input, output and input/output (I/O) or
 local ports, and rows specify the relationship between input and output
 values on these ports. Each port is associated with an alphabet and each cell in a table consists of a string of letters from this alphabet with discrete
@@ -12,7 +12,7 @@ is said to match when the string given in that cell is a subscript of the values
 input port corresponding to that cell's column. A row of an EDT matches when
 all the cells corresponding to that row match and one cell matches on the last
 input.  Table~\ref{tab:edt-alarm} gives an example, adapted from
-\cite{Venkatesh:ENASE:2015}, specifying a subset of requirements of a car alarm
+\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}, specifying a subset of requirements of a car alarm
 module.
 
 \newcolumntype{A}{>{\centering}p{1cm}}
@@ -54,9 +54,9 @@ following requirements:
 A test case for a requirement is a sequence of Port values  that match the
 EDT row for that requirement. The use of EDTs and test case generation
 algorithms from EDT specifications have been widely studied.
-~\cite{Venkatesh:ENASE:2015}. However, the notation lacks a rigorous
+~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}. However, the notation lacks a rigorous
 formal semantics, except for a brief description of key elements of formal
-semantics in~\cite{Venkatesh:DATE:2014}. Hence, none of the test case algorithms use
+semantics in~\cite{DBLP:conf/date/VenkateshSKA14}. Hence, none of the test case algorithms use
 formal techniques like model checking and instead rely in random generation
 using heuristics. These algorithms, therefore, cannot prove that an EDT row
 cannot be matched and also find it hard to match certain rows. We overcome both
