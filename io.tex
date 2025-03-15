@@ -14,7 +14,7 @@ and \emph{Alarm}.
 The first requirement checks for $I:\mathtt{Off} \parallel A:\mathtt{Off} \parallel P:\mathtt{Press;Press}$ and immediately writes $A: \mathtt{On}$. The check-and-update is a fully atomic operation. One way to model this requirement as an mDSA would be to absorb port $A$ as part of the state: that is the state of the mDSA is defined using values of such variables. However, this would lead to an exponential blowup in the number of states when there are multiple such ports that are both read and written on transitions. To succinctly capture requirements with outputs, we allow both reads and writes on all ports and define \emph{mDSAs with outputs}. Later, in Section~\ref{sec:edt} we will use these mDSAs-with-outputs to give a semantics for the industrial notation Expressive Decision Tables (EDTs).
 
 \subsection{mDSA-with-outputs: formal syntax and semantics}
-
+\label{sec:mdsao-synt}
 The syntax of mDSA-with-outputs is almost the same as that of mDSAs. The only difference is in the syntax of transitions.  As before, there is a multiport alphabet $\Sigma = \langle \Sigma_1, \dots, \Sigma_k \rangle$. An mDSA-with-outputs $\Bb$ is a tuple $(Q, \Sigma, q^{init}, \delta)$ where $Q$ is a finite set of states, $q^{init}$ is the initial state and $\delta$ is a finite set of transitions. We do not view these automata as language acceptors, and so we do not specifically define accept states. We will later discuss the state reachability problem. 
 
 \paragraph*{Transitions.} A transition now looks like:

@@ -71,26 +71,27 @@ through a translation to mDSA.
 
 \subsection{Translating EDT to mDSA-with-outputs}
 
-An EDT with $I$ input columns and $R$ rows is translated to an mDSA, with one
-state $q$ and an alphabet $\Sigma = \langle \Sigma_1 \cdots \Sigma_I \rangle$.
-Each $\Sigma_i$ corresponds to the Port of column $i$ and the
-letters of the alphabet correspond to the values that the Signal can take
-prefixed by $<Portname:>$. Thus if the Port name of the first
+An EDT with $C$ columns and $R$ rows is translated to an mDSA, with one
+state $q_0$ and an alphabet $\Sigma = \langle \Sigma_1 \cdots \Sigma_|C| \rangle$.
+Each $\Sigma_i$ corresponds to the port of column $i$ and the
+letters of the alphabet correspond to the values that the signal can take.
+prefixed by $\langle Portname: \rangle$. 
+Thus if the Port name of the first
 column is $A$ and its alphabet is ${ a_1, a_2, \cdots, a_k}$ then the
 corresponding alphabet $\Sigma_1 = {A:a_1, A:a_2 \cdots A:a_k}$. 
 Each EDT row is translated to an mDSA as follows:
 \begin{itemize}
-\item The mDSA has exactly one state - $q_0$
-\item 
-The alphabets of all the ports together make a multi-port alphabet for the mDSA
-\item
-Each port has a corresponding tape. Each row has a tape head in each tape, corresponding to itself.
+\item The mDSA has exactly one state $q_0$
+%\item 
+%The alphabets of all the ports together make a multi-port alphabet for the mDSA
+%\item
+%Each port has a corresponding tape. Each row has a tape head in each tape, corresponding %to itself.
 \item
 There is a transition corresponding to each row with $q_0$ as both the source and target state. 
 \item
-The label of each transition consists of all the strings in the cells of the input columns of the row combined using the $||$ operator.
+The label of each transition consists of all the strings in the cells of the input columns of the row combined using the $\parallel$ operator.
 \item 
-The output of the transitions are the strings in the cell corresponding to the output columns
+The output of the transitions are the strings in the cell corresponding to the output columns, combined using the $\parallel$ operator.
 \end{itemize}
 
 The mDSA in Figure~\ref{fig:state-diagram} is a mDSA specification corresponding the EDT given in Table~\ref{tab:edt-alarm}
@@ -122,6 +123,7 @@ The mDSA in Figure~\ref{fig:state-diagram} is a mDSA specification corresponding
     \label{fig:state-diagram}
 \end{figure}
 
+To generate a test for a certain row $r$, we can first add a special state $q_r$, and make the transition corresponding to this row point to $q_r$ instead of $q_0$. A test  for $r$ then reduces to a witness for the reachability of $q_r$. 
 
 %%The mDSA above is a succinct representation of the EDT semantics. The states of a multi-port DSA are defined as per the requirements of the system it models. For a system with internal variables $S_1,S_2,\dots$ with each variable $S_i$ having an alphabet $\Sigma_{S_i}$, the corresponding \mdsa has states $Q=\Sigma_{S_1} \times \Sigma_{S_2} \times \dots$, but as seen earlier, this can be captured using additional tape instead. The additional tapes $B_{S_1}, B_{S_2}, \dots$ are for the internal variables used in the system. These variables can read input as well as produce output, over the alphabet representing their state space. %For example, a variable $S_i$ has an alphabet $\Sigma_{S_i}$ with letters that can be input as well as output.
 %%
