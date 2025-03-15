@@ -95,7 +95,7 @@ Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is
   
   The formal semantics of an mDSA $\Aa$ is given by a transition system $\Ss^\Aa = (S, S_0, \xra{}, S_F)$  over the configurations: the set of nodes $S$ is  the set of all configurations $(q, w, \theta)$ (notice that this set is infinite); the initial node $s_0 = (q^{init}, \epsilon, 0)$, also called \emph{the initial configuration}; $S_F$  is the set of \emph{accepting configurations} which are configurations $(q, w, \theta)$ where $q \in F$ and $\theta = |w|$ (signaling reaching an accepting state immediately after a match); to describe the transition relation $\xra{}$, we first explain when a transition label matches with a tape configuration. 
 
-  \begin{definition}
+  \begin{definition}\label{def:match}
     We say that a transition label $(u_1 \parallel u_2 \parallel \cdots \parallel u_k)$ matches a tape configuration $(w, \theta)$ if:
     \begin{itemize}
       \item $u_i$ is a suffix of $\proj{i}(w)$ for all ports $i$,
