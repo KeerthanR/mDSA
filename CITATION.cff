@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Arul"
+  given-names: "Keerthan"
+  
+- family-names: "Ravi"
+  given-names: "Keerthan"
+  
+title: "mDSA-based test generator for EDT"
+version: 1.0.0
+
+date-released: 2025-03-15
+url: "https://github.com/KeerthanR/mDSA/tree/main/code"
