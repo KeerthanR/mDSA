@@ -66,22 +66,25 @@
 	  specifications that are based on \emph{sequences} of input actions (and
 	  not just single actions). For a distributed system, specifications may
 	  further depend on combinations of input sequences seen across multiple
-	  components (ports) that communicate with each other.  For such systems, DSAs consider all possible
+	  components (ports).  For such systems, DSAs consider all possible
 	  interleavings, resulting in large and unreadable automata.
 
-  In this work, we enrich DSAs to include a $\parallel$ operator and output of letters to ports in its
+    In this work, we enrich DSAs to include a $\parallel$ operator in its
 	  transitions. The resulting \emph{multi-port DSAs (mDSAs)} can succinctly
-	  represent concurrent suffix-based specifications. We provide a formal
-	  operational semantics for mDSAs and prove that emptiness for mDSAs is
-	  PSPACE-complete.  Then, we apply our results to the analysis of Expressive
-	  Decision Tables (EDTs) -- an industry notation for specifying requirements
-	  of reactive systems. The EDT notation has been successfully deployed in
-	  various industrial settings. However, arguably, due to a complex interplay
-	  between concurrency and suffix-based conditions, the notation lacks a
-	  rigorous operational semantics. As a result, existing test generation
-	  algorithms for EDTs do not give any theoretical guarantees. Here, we
-	  provide formal operational semantics for a fragment of the EDT notation
-	  using mDSAs, and reduce EDT-test-generation to mDSA-emptiness.
+	  represent concurrent suffix-based specifications. Subsequently, we extend mDSAs to produce outputs on transitions, and show that state reachability becomes PSPACE-complete in the presence of outputs. Finally, we apply our results to the formal analysis of Expressive Decision Tables (EDT) -- an industry notation for specifying requirements of  reactive systems.
+    
+    
+    %These mDSA-with-outputs We provide a formal
+	 % operational semantics for mDSAs and prove that emptiness for mDSAs is
+	  %PSPACE-complete.  Then, we apply our results to the analysis of Expressive
+	  % Decision Tables (EDTs) -- an industry notation for specifying requirements
+	  % of reactive systems. The EDT notation has been successfully deployed in
+	  % various industrial settings. However, arguably, due to a complex interplay
+	  % between concurrency and suffix-based conditions, the notation lacks a
+	  % rigorous operational semantics. As a result, existing test generation
+	  % algorithms for EDTs do not give any theoretical guarantees. Here, we
+	  % provide formal operational semantics for a fragment of the EDT notation
+	  % using mDSAs, and reduce EDT-test-generation to mDSA-emptiness.
   
   \end{abstract}
   
