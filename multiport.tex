@@ -81,7 +81,7 @@ We first describe the formal syntax and then proceed to an operational semantics
 Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is an example to illustrate the syntax of an mDSA. \textcolor{red}{(TODO)}.
 
  For the semantics, it is convenient to assume that there is a \emph{tape} on which the automaton writes all its inputs. Initially, the tape is $\epsilon$. Each time an input letter $a \in \Sigma$ is received, the automaton appends it to the right of the tape. 
- For a word $w = a_1 \dots a_{n}$, with $a_i \in \Sigma$, we write $w(i)$ to denote the letter $a_i$. The length of $w$, denoted as $|w|$, equals $n$ (the number of letters). For $j \in \{0, \dots, n-1\}$ we write $w[i, j]$ to denote the substring $a_i a_{i+1} \dots a_j$.
+ For a word $w = a_1 \dots a_{n}$, with $a_i \in \Sigma$, we write $w(i)$ to denote the letter $a_i$. We remark our convention that the indices of $w$ start from $1$ (and not $0$). The length of $w$, denoted as $|w|$, equals $n$ (the number of letters). For $j \in \{1, \dots, n\}$ we write $w[i, j]$ to denote the substring $a_i a_{i+1} \dots a_j$.
   %The $p$ tape heads $\lt_1, \lt_2, \dots, \lt_p$ point to various positions in the tape. A \emph{tape configuration} is therefore given as $(T, i_1, i_2, \dots, i_p)$ where $T$ is the current word in the tape, and $i_1, \dots, i_p \in \Nat$ are the positions pointed to by the heads $\lt_1, \dots, \lt_p$ respectively. A \emph{configuration} of an mDSA is then given by a state $q$ and a tape configuration: $(q, T, i_1, \dots, i_p)$. 
 
   A \emph{configuration} of an mDSA is given by $(q, w, \theta)$ where
@@ -90,24 +90,32 @@ Figure~\ref{fig:mdsa-examples} gives two mDSAs adhering to this syntax. %Here is
   \item $w$ is the word read so far, from the beginning
   \item $\theta \in \Nat$ marks a position in the word where the last match of a transition appeared.  
   \end{itemize} 
+  We refer to the pair $(w, \theta)$ as the \emph{tape configuration}.
   
-  The formal semantics of an mDSA $\Aa$ is given by a transition system $\Ss^\Aa = (S, S_0, \xra{}, S_F)$  over the configurations: the set of nodes $S$ is  the set of all configurations $(q, w, \theta)$ (notice that this set is infinite); the initial node $s_0 = (q^{init}, \epsilon, 0)$, also called \emph{the initial configuration}; $S_F$  is the set of \emph{accepting configurations} which are configurations $(q, w, \theta)$ where $q \in F$ and $\theta = |w|$ (signaling reaching an accepting state immediately after a match); the transition relation $\xra{}$ is described as follows.  
+  The formal semantics of an mDSA $\Aa$ is given by a transition system $\Ss^\Aa = (S, S_0, \xra{}, S_F)$  over the configurations: the set of nodes $S$ is  the set of all configurations $(q, w, \theta)$ (notice that this set is infinite); the initial node $s_0 = (q^{init}, \epsilon, 0)$, also called \emph{the initial configuration}; $S_F$  is the set of \emph{accepting configurations} which are configurations $(q, w, \theta)$ where $q \in F$ and $\theta = |w|$ (signaling reaching an accepting state immediately after a match); to describe the transition relation $\xra{}$, we first explain when a transition label matches with a tape configuration. 
 
-Let $\rho: (q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ be an outgoing transition from $q$. There is a transition:
+  \begin{definition}
+    We say that a transition label $(u_1 \parallel u_2 \parallel \cdots \parallel u_k)$ matches a tape configuration $(w, \theta)$ if:
+    \begin{itemize}
+      \item $u_i$ is a suffix of $\proj{i}(w)$ for all ports $i$,
+      \item each $u_i$ appears entirely before or entirely after $\theta$: that is, $u_i$ is a subword of $w[1, \theta]$ or $w[\theta+1, |w|]$,
+      \item at least one $u_i$ appears entirely after $\theta$.
+    \end{itemize}
+  \end{definition}
+
+\paragraph*{Transitions.} Let $\rho: (q, (u_1 \parallel u_2 \parallel \cdots \parallel u_k), q')$ be an outgoing transition from $q$. 
+\begin{itemize}
+\item In $\Ss^\Aa$, there is a following transition:
 \begin{align*}
  (q, w, \theta) \xra[~u_1 \parallel u_2 \parallel \cdots \parallel u_k~]{a} (q', wa, \theta') \qquad \text{if}
 \end{align*}
-\begin{itemize}
-  \item $u_i$ is a suffix of $\proj{i}(wa)$ for all ports $i$,
-  \item each $u_i$ appears entirely before or entirely after $\theta$: that is, $u_i$ is a subword of $w[0, \theta]$ or $w[\theta+1, |w|-1]$,
-  \item at least one $u_i$ appears entirely after $\theta$, and
-  \item $\theta' = |w|$ (tape head moves to the end of the word on a match).
-\end{itemize}
-There is a transition of the form:
+
+\item There is a transition of the form:
 \begin{align*}
   (q, w, \theta) \xra{a} (q, wa, \theta)
 \end{align*}
-if no transition out of $q$ matches the resulting tape configuration $(wa, \theta)$. 
+if no transition out of $q$ matches the tape configuration $(wa, \theta)$. In this case, the tape head remains at its position.
+\end{itemize} 
 
 The transition relation $\xra{}$ of $\Ss^\Aa$ is a union over all $\xra[u_1 \parallel u_2 \parallel \cdots \parallel u_k]{a}$ and $\xra{a}$.
 
