@@ -1,21 +1,22 @@
-\section{Related Work}
+\subsubsection*{Related work.}
 Use of automata to model distributed systems has been explored widely.
 Esterel~\cite{DBLP:journals/scp/BerryG92} is a synchronous programming language
 that provides a parallel composition operator. Harel's
-Statecharts!\cite{DBLP:journals/scp/Harel87} also support parallel composition
+Statecharts~\cite{DBLP:journals/scp/Harel87} also support parallel composition
 of state transition systems. In both these languages the reaction of a system
 in response to inputs on each port can be specified separately and the
 different specifications can be composed using the parallel operator. A system
 model can then refer to the states of each port's specification to model the
-system behaviour. mDSAs specifications are more succinct than Statecharts or Esterel specifications of System behaviours similar to the examples described in this
-paper. Petri nets~\cite{CAPetri}
+system behaviour. In mDSAs, we do not compose automata. Instead there is a single automaton, but the transitions include a parallel composition operator. More importantly, mDSA allows for suffix-based event triggers. %specifications are more succinct than Statecharts or Esterel specifications of System behaviours similar to the examples described in this
+%paper. 
+Petri nets~\cite{CAPetri}
 have been studied extensively to model concurrent systems. In Petri nets each
 letter of each port's alphabet will have to be represented using a place and
-the places combined to model the system. This will not be as succinct as an
-mDSA. 
+the places combined to model the system. There is no mechanism to include suffix-based triggers. %This will not be as succinct as an
+%mDSA. 
 The work that is closest to ours is Input/Output Partial Order
-Automata(IOPOA)~\cite{10.5555/2391293.2391305}. In their work transitions
+Automata (IOPOA)~\cite{10.5555/2391293.2391305}. In their work transitions
 execute non-atomically reacting to asynchronous inputs on several ports. The
-main differences between IOPOA and mDSA are - in mDSA transitions react
-atomically, transition labels can be strings for each port and not just letters
-and different transitions may trigger on the same string at a port. For example consider the first mDSA in Figure~\ref{fig:mdsa-examples}, the transition from $Off$ to $Started$ and $Started$ to $Drive$ can be taken on the same input $B$. In an IOPOA this will require two occurences of $B$. IOPOA was primarily designed to enable test generation whereas the aim of mDSAs is succinct specification of requirements.
+main differences between IOPOA and mDSA: in mDSA transitions react
+atomically, transition labels can be strings representing a suffix for each port and not just letters,
+and different transitions may trigger on the same string at a port. For example consider the mDSA in Figure~\ref{fig:mdsa-examples}(a), the transition from $\mathtt{Off}$ to $\mathtt{Started}$ and $\mathtt{Started}$ to $\mathtt{Drive}$ can be taken on the same input $B$. In an IOPOA this will require two occurences of $B$. IOPOA was primarily designed to enable test generation whereas the aim of mDSAs is succinct specification of requirements.

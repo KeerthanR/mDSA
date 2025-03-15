@@ -3,7 +3,7 @@
 
   % Automata are very useful. In particular in formal verification and model-based testing.
 
-  Finite state automata are all-pervasive, adopting different roles in different contexts. In this work, we focus on the role of automata as \emph{formal models of system requirements} and their subsequent application in Model Based Testing (MBT). MBT is a paradigm in formal methods where the requirements of a system under test (SUT) are first converted to a formal model. This formal model is then used to automatically generate test cases for the SUT. There are many MBT tools (see \cite{10.1145/1353673.1353681,10.1002/stvr.456} for a survey) and in several of them, the formal model is given by some extension of finite automata. 
+  Finite state automata are all-pervasive, adopting different roles in different contexts. We focus on the role of automata as \emph{formal models of system requirements} and their subsequent application in Model Based Testing (MBT). MBT is a paradigm in formal methods where the requirements of a system under test (SUT) are first converted to a formal model. This formal model is then used to automatically generate test cases for the SUT. There are many MBT tools (see \cite{10.1145/1353673.1353681,10.1002/stvr.456} for a survey) and in several of them, the formal model is given by some extension of finite automata. 
 
   %Automata can be made concise.Making automata concise is a long line of work. Different ways in which they could be made concise. In MBT this helps in writing more concise specifications. 
 
@@ -59,7 +59,8 @@
   \label{fig:dsa-examples}
   \end{figure}
 
-  In Figure~\ref{fig:dsa-examples}(a), the DSA accepts all words that end with $ab$, for instance $bab, bbab, babab$, etc. The transition $q_0 \xra{ab} q_0$ is fired as soon as a word ending with $ab$ is seen. In Figure~\ref{fig:dsa-examples}(a), we can view the state $q_0$ as tracking two suffixes $ba$ and $ab$. When $ba$ is seen before $ab$, the self-loop is triggered; otherwise when $ab$ is seen first, the transition to $q_1$ is taken. For example, on word $bbab$, the automaton starts at $q_0$, and on $bba$ it fires $q_0 \xra{ba} q_0$, reads $b$ and remains there. Since $q_0$ is non-accepting, the word is rejected. However, on $bbaab$, the run loops on $bba$ back to $q_0$, and then reads the next $ab$ to reach $q_1$, and accept. The final example Figure~\ref{fig:dsa-examples}(c) is a \emph{suffix-based specification} of a part of an automotive software: when the alarm is off, and the panic switch is pressed twice within one second, flag an error. Here, we assume there is a symbol \texttt{tick} to denote the elapse of $1$ unit of time. So, on a word \texttt{tick}; \texttt{On}; \texttt{tick} \texttt{Off}; \texttt{PanicSw}; \texttt{PanicSw}, an error should be flagged (we have added a separator symbol ; just for clarity). This specification is succinctly represented by the DSA in Figure~\ref{fig:dsa-examples}(c).
+  In Figure~\ref{fig:dsa-examples}(a), the DSA accepts all words that end with $ab$, for instance $bab, bbab, babab$, etc. The transition $q_0 \xra{ab} q_0$ is fired as soon as a word ending with $ab$ is seen. In Figure~\ref{fig:dsa-examples}(b), we can view the state $q_0$ as tracking two suffixes $ba$ and $ab$. When $ba$ is seen before $ab$, the self-loop is triggered; otherwise when $ab$ is seen first, the transition to $q_1$ is taken. For example, on word $bbab$, the automaton starts at $q_0$, and on $bba$ it fires $q_0 \xra{ba} q_0$ (since $ba$ is a suffix of $bba$), then reads $b$ and remains there. %Since $q_0$ is non-accepting, the word is rejected. 
+  However, on $bbaab$, the run loops on $bba$ back to $q_0$, and then reads the next $ab$ to reach $q_1$, and accept. The final example Figure~\ref{fig:dsa-examples}(c) is a \emph{suffix-based specification} of a part of an automotive software: when the alarm is off, and the panic switch is pressed twice within one second, flag an error. Here, we assume there is a symbol \texttt{tick} to denote the elapse of $1$ unit of time. So, on a word \texttt{tick}; \texttt{On}; \texttt{tick}; \texttt{Off}; \texttt{PanicSw}; \texttt{PanicSw}, an error should be flagged (we have added a separator symbol ; just for clarity). This specification is succinctly represented by the DSA in Figure~\ref{fig:dsa-examples}(c).
 
    Since transitions in a DSA wait for specific patterns to appear, DSAs are able to represent suffix-based specifications succinctly. When we consider systems with multiple components (which we call ports), the requirements can talk about different combinations of inputs. Here are two examples. 
 
@@ -78,7 +79,7 @@
         \draw (-0.75,0) to (0);
         %\draw (0) to [bend left] node [left] {\scriptsize \texttt{On}} (1);
         %\draw (1) to [bend left] node [right] {\scriptsize \texttt{Off}} (0);
-        \draw (0) to node [below] {\scriptsize $B \parallel P \parallel$ \texttt{On}} (2);
+        \draw (0) to node [below] {\scriptsize $B \parallel P \parallel$ $K$} (2);
         \draw (2) to node [right] {\scriptsize $B \parallel D$ } (3);
         \draw (3) to node [left] {\scriptsize $B \parallel P \parallel$ \texttt{Off}$~$} (0); 
         \draw (3) to node [above] {\scriptsize $D \parallel$ \texttt{Off}} (1);
@@ -106,23 +107,24 @@
    \caption{Concurrent suffix-based specifications as multi-port DSAs}
    \label{fig:mdsa-examples}
    \end{figure}
-   \paragraph*{Car Security System.} For a car to start, you need: key in ignition ($K$), brake pedal pressed ($B$), transmission in park ($P$), and no alarm triggered. The actions $K$, $B$ and $P$ can occur in any order. A DSA would need to represent this requirement using all $6$ permutations. Instead, we assume an alphabet that is distributed across different \emph{ports} -- ignition, brake pedal, transmission, and denote the concurrent actions as $K \parallel B \parallel P$. Figure~\ref{fig:mdsa-examples}(a) illustrates the enriched DSA.
+   \paragraph*{Car Security System.} For a car to start, you need: key in ignition ($K$), brake pedal pressed ($B$), and transmission in park ($P$). The actions $K$, $P$ and $B$ can occur in any order. A DSA would need to represent this requirement using all $6$ permutations. Instead, we assume an alphabet that is distributed across different \emph{ports} -- ignition, brake pedal, transmission, and denote the concurrent actions as $K \parallel B \parallel P$. Here are some requirements of a car security system. Figure~\ref{fig:mdsa-examples}(a) illustrates the enriched DSA.
 
    \begin{itemize}
-   \item When the brake pedal is pressed ($B$) and transmission is in park $(P)$, if ignition becomes on ($ON$), then the car is started.
-   \item If the brake pedal is pressed ($(B)$) and the transmission is moved to drive ($D$), the car goes to the drive mode.
-   \item When the brake pedal is pressed ($B$), transmission is in park, and the ignition becomes off ($OFF$), the car is switched off. If ignition is switched off when brake is not pressed or when transmission is in drive/reverse, signal an error.
+   \item When the brake pedal is pressed ($B$), transmission is in park $(P)$ and key is in ignition ($K$), the car can be started.
+   \item If the brake pedal is pressed ($B$) and the transmission is moved to drive ($D$), the car goes to the drive mode.
+   \item When the brake pedal is pressed ($B$), transmission is in park, and the ignition becomes off ($\mathtt{Off}$), the car is switched off. If ignition is switched off when brake is not pressed or when transmission is in drive/reverse, signal an error.
    \end{itemize}
 
   
-   \paragraph*{Smartphone Lock Pattern} To unlock a phone with pattern: fingerprint verification ($F$) and drawing specific gesture with three touch points ($T_1;T_2;T_3$). This is represented as $F \parallel (T_1 T_2 T_3)$ and the enriched DSA is shown in Figure~\ref{fig:mdsa-examples}(b).
+   \paragraph*{Smartphone Lock Pattern.} %To unlock a phone with pattern, we need button pressed, fingerprint verification and drawing of a specific gesture with three touch points.  This is represented as $F \parallel (T_1 T_2 T_3)$ and the enriched DSA is shown in 
+   Figure~\ref{fig:mdsa-examples}(b) represents the enriched DSA modeling the requirements below for a smartphone lock.
 
    \begin{itemize}
-   \item When the button is pressed ($B$), fingerprint verified and a correct pattern is received $(F_1 F_2 F_3)$, then the phone is switched on.
-   \item If the phone is on, and the button is pressed ($B$), the phone is switched off.  
+   \item When the button is pressed ($\mathtt{Press}$), fingerprint verified $(F)$ and a correct pattern is received $(T_1 T_2 T_3)$, then the phone is switched on.
+   \item If the phone is on, and the button is pressed, the phone is switched off.  
    \end{itemize}
    
-  In Appendix~\ref{app:examples-of-parallel}, we give many more examples of similar situations that involve multiple ports and suffix-based requirements across all of them. To the best of our knowledge, no automaton model can represent such specifications succinctly. Incorporating concurrency into the specification is paramount when requirements talk about different components of the distributed system. 
+  In Appendix~\ref{app:examples-of-parallel}, we give many more examples of similar situations that involve multiple ports and suffix-based requirements across all of them. To the best of our knowledge, no automaton model can succinctly represent the combination of suffix-based patterns across a concurrent system. Incorporating concurrency into the specification is paramount when requirements talk about different components of the distributed system. 
   
   \subsubsection*{Contributions.} The goal of this paper is to investigate the
   addition of a $\parallel$ operator coupled with output to ports into the
@@ -130,12 +132,12 @@
   DSAs}, where the alphabet is distributed (partitioned) across multiple ports.
   The challenge lies in describing an operational semantics that matches with
   our intentions. As our first technical contribution, we provide a formal
-  operational semantics for multi-port DSAs. 
+  operational semantics for multi-port DSAs, or mDSAs (Section~\ref{sec:multiport}).
   
-  We then show that state reachability (or emptiness) for mDSAs is PSPACE-complete. For the simpler models DFAs or DSAs, reachability is linear in the input size. The higher complexity for mDSAs ties with the intuition that mDSAs can be exponentially more succinct. Our proof of PSPACE-hardness indeed exhibits such an example. 
+  Next, we include the feature to produce outputs on transitions, giving us mDSA-with-outputs. When the produced outputs also influence suffix-based input conditions, the behaviours become more complex. In fact, we then show that state reachability for mDSA-with-outputs is $\PSPACE$-complete. When there are no outputs, reachability is simply linear in the input size. %The higher complexity for mDSAs ties with the intuition that mDSAs can be exponentially more succinct. Our proof of PSPACE-hardness indeed exhibits such an example. 
 
   As our next contribution, we apply the mDSA framework to provide a formal semantics for Expressive Decision Tables (EDTs), a notation introduced by \cite{DBLP:conf/date/VenkateshSKA14} to incorporate both state-based and stream-based requirements in one convenient tabular form. The EDT notation has been successfully deployed in many industrial projects. In \cite{DBLP:conf/date/VenkateshSKA14} it has also been observed that the time and effort involved in writing EDT specifications was considerably low compared to other formalisms like  Statecharts. Many test generation tools for EDT specifications have been developed: given an EDT, and a row, the tool can generate a sequence of input actions that can trigger the input-side conditions of the particular row~\cite{DBLP:conf/enase/VenkateshSZA15a,DBLP:conf/icst/AgrawalVSZV20}. %The tricky part in the EDT notation is the use of input-output (I/O) variables that make multiple rows dependent. 
-  Although EDTs have been used extensively for test generation, the notation does not yet have a formal operational semantics because of a complex interplay between concurrency and suffix-based rules. We close these gaps using the mDSA technology: we consider a fragment of the EDT notation, and map each EDT to an mDSA. This in turn gives an operational semantics for the EDT. Moreover, test generation for EDTs reduces to state reachability in mDSAs. 
+  Although EDTs have been used extensively for test generation, the notation does not yet have a formal operational semantics because of a complex interplay between concurrency and suffix-based rules. We close these gaps using the mDSA technology: we consider a fragment of the EDT notation, and map each EDT to an mDSA-with-outputs. This in turn gives an operational semantics for the EDT. Moreover, test generation for EDTs reduces to state reachability in mDSA-with-outputs. We also develop a prototype implementation for state reachability in mDSA-with-outputs, using which we generate test cases for an intricate EDT example. 
   
   
   
