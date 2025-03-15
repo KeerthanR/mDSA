@@ -29,7 +29,7 @@ where $q, q'$ are states; each $u_j$ is a word in the port alphabet of $I_j$; an
 \item \emph{transitions on input letters.} if no outgoing transition from $q$ has a label that  matches the current tape configuration $(w, \theta)$, then there is no $\epsilon$ transition out of $(q, w, \theta)$ and the mDSA-with-outputs listens to further input letters: 
 \begin{itemize}
 \item $(q, w, \theta) \xra[\rho]{~~a~~} (q', wab_1 b_2 \dots b_m, |wa|)$ if $I_1:u_1 \parallel \cdots \parallel I_\ell:u_\ell$ matches $(wa, \theta)$; then, move the tape head to the end of $wa$ and write the outputs after that,
-\item $(q, w, \theta) \xra{~~a~~} (q', wa, \theta)$ if no transition out of $q$ matches $(wa, \theta)$.
+\item $(q, w, \theta) \xra{~~a~~} (q, wa, \theta)$ if no transition out of $q$ matches $(wa, \theta)$.
 \end{itemize}
 \end{itemize} 
 Notice that the transitions on input letters have the same matching semantics as in an mDSA, except now they also write all the outputs to the end of the word. The main change is the presence of $\epsilon$-transitions. Since we write outputs after matching a transition, on reaching a new state $q'$ there could already be transitions out of $q'$ that match the current tape. Previously, in mDSA, this would not happen, since the tape head would be at the end of the word, and at least one port should see a fully fresh match. %Here, after a match on $wa$, the tape head comes to $wa$, and the outputs are written after that, resulting in $wa b_1 b_2 \dots b_m$. These new outputs may in turn trigger a transition from $q'$, without having to see additional inputs.
