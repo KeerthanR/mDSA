@@ -12,7 +12,7 @@ Let $\Sigma$ be a finite alphabet. A DSA $\Aa$ is given by a tuple $(Q, \Sigma, 
 
 A \emph{configuration} of a DSA is given by $(q, w)$ where $q$ is the current state, and $w$ is the word seen \emph{after reaching} $q$. The initial configuration is $(q_0, \epsilon)$. Transitions are as follows:
 \begin{itemize}
-\item $(q, w) \xra{a} (q, wa)$ is no string in $\out(q)$ is a suffix of $wa$,
+\item $(q, w) \xra{a} (q, wa)$ if no string in $\out(q)$ is a suffix of $wa$,
 \item $(q, w) \xra[u]{a} (q', \epsilon)$ if $u$ is the longest string of $\out(q)$ which is a suffix of $wa$, and $(q, u, q')$ is the corresponding transition. 
 \end{itemize}
 A configuration $(q, w)$ is accepting if $q \in F$ and $w = \epsilon$, signifying that the accepting state was reached on the last input.
