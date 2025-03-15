@@ -3,24 +3,33 @@
 
 \section{Determinisitic Suffix-reading Automata (DSA)}
 
-In this section, we recall the syntax and semantics of deterministic suffix-reading automata (DSA)~\cite{DBLP:journals/corr/abs-2410-22761}. We provide an alternate presentation of the DSA semantics that helps extend naturally to the mDSA model.
+In this section, we recall the formal syntax and semantics of deterministic suffix-reading automata (DSA)~\cite{DBLP:journals/corr/abs-2410-22761}. For a finite alphabet $\Sigma$, we write $\Sigma^+$ for $\Sigma^* \setminus \{\epsilon\}$. %We provide an alternate presentation of the DSA semantics that helps extend to the mDSA model.
 
 \begin{definition}[Deterministic Suffix-reading Automata (DSA)]
-Let $\Sigma$ be a finite alphabet. A DSA $\Aa$ is given by a tuple $(Q, \Sigma, q_0, \Delta, F)$ where $Q$ is a finite set of states, $q_0$ is the initial state and $F \incl Q$ is a set of final states, and $\Delta : Q \times \Sigma^+ \rightharpoonup Q$ is a  partial function with a finite domain. Each transition therefore is of the form $(q, u, q')$ where $q, q' \in Q$ and $u \in \Sigma^*$. 
-
-We write $\out(q) := \{ w \in \Sigma^+ \mid \Delta(q, u) \text{ is defined }\}$.
+Let $\Sigma$ be a finite alphabet. A DSA $\Aa$ is given by a tuple $(Q, \Sigma, q_0, \delta, F)$ where $Q$ is a finite set of states, $q_0$ is the initial state and $F \incl Q$ is a set of final states, and $\delta \incl Q \times \Sigma^+ \times \Sigma$. Each transition therefore is of the form $(q, u, q')$ where $q, q' \in Q$ and $u \in \Sigma^*$. We write $\out(q) := \{ w \in \Sigma^+ \mid (q, u, q') \in \delta \}$.
+%$\delta : Q \times \Sigma^+ \rightharpoonup Q$ is a  partial function with a finite domain. 
 \end{definition}
 
- Let $T$ be an unbounded \emph{tape} with two tape heads $\lt$ and $\rt$. We assume that the input word is written on the tape $T$, with one letter per cell. For $i \in \Nat$ we denote by $T(i)$ the letter in cell $i$ of the tape, and for $i, j \in \Nat$ with $i \le j$, we will write $T[i, j]$ for the string $T(i) T(i+1) \cdots T(j)$. Initially both the tape heads $\lt$ and $\rt$ are at position $0$, and the DSA is at its initial state $q_0$.
-
-Intuitively, tape head $\lt$ stores the last position when a state change happened, and $\rt$ stores the position upto which the word has been processed. Therefore, the position of $\rt$ is always to the right of $\lt$. The DSA is in some state $q$ and the tape head $\rt$ keeps moving to the right processing one letter at a time. The first instant when some string in $\out(q)$ appears as a suffix of the part of the tape between the $\lt$ and $\rt$ tape heads, a corresponding transition is triggered: DSA moves to the target state, and $\lt$ moves to $\rt$. 
-
-Formally, a \emph{configuration} of a DSA is given by $(q, i, j)$ where (1) $q \in Q$ is the current state of $\Aa$, (2) $i, j \in \Nat$, with $i \le j$, denote the position of the tape heads $\lt$ and $\rt$ respectively, (3) no $u \in \out(q)$ appears as a substring of the string $T[i, j]$ (which is the part of the word processed so far after the last state change). At configuration $(q, i, j)$ the DSA reads the letter $T(j+1)$.
+A \emph{configuration} of a DSA is given by $(q, w)$ where $q$ is the current state, and $w$ is the word seen \emph{after reaching} $q$. The initial configuration is $(q_0, \epsilon)$. Transitions are as follows:
 \begin{itemize}
-\item $(q, i, j) \xra{T(j+1)} (q, i, j+1)$ if no string of $\out(q)$ is a suffix of $T[i, j+1]$,
-\item $(q, i, j) \xra{T(j+1)} (q_u, j+1, j+1)$ if $u \in \out(q)$ is the longest string that appears as a suffix of $T[i, j+1]$ and $\Delta(q, u) = q_u$. 
+\item $(q, w) \xra{a} (q, wa)$ is no string in $\out(q)$ is a suffix of $wa$,
+\item $(q, w) \xra[u]{a} (q', \epsilon)$ if $u$ is the longest string of $\out(q)$ which is a suffix of $wa$, and $(q, u, q')$ is the corresponding transition. 
 \end{itemize}
-A configuration $(q, i, j)$ is accepting if $q \in F$ and $i = j$. A \emph{run} is a sequence of transitions $\xra{}$. Notice that each word has a unique run: from a state, the first time there is a match, a transition is triggered; if there are multiple matches, we take the longest match. A word $w$ is accepted by $\Aa$ if the run of $\Aa$ on $w$ ends in an accepting configuration.
+A configuration $(q, w)$ is accepting if $q \in F$ and $w = \epsilon$, signifying that the accepting state was reached on the last input.
 
-We illustrate the semantics on an example. \textcolor{red}{TODO}
+ %Let $T$ be an unbounded \emph{tape} with two tape heads $\lt$ and $\rt$. We assume that the input word is written on the tape $T$, with one letter per cell. For $i \in \Nat$ we denote by $T(i)$ the letter in cell $i$ of the tape, and for $i, j \in \Nat$ with $i \le j$, we will write $T[i, j]$ for the string $T(i) T(i+1) \cdots T(j)$. Initially both the tape heads $\lt$ and $\rt$ are at position $0$, and the DSA is at its initial state $q_0$.
+
+%Intuitively, tape head $\lt$ stores the last position when a state change happened, and $\rt$ stores the position upto which the word has been processed. Therefore, the position of $\rt$ is always to the right of $\lt$. The DSA is in some state $q$ and the tape head $\rt$ keeps moving to the right processing one letter at a time. The first instant when some string in $\out(q)$ appears as a suffix of the part of the tape between the $\lt$ and $\rt$ tape heads, a corresponding transition is triggered: DSA moves to the target state, and $\lt$ moves to $\rt$. 
+
+%Formally, a \emph{configuration} of a DSA is given by $(q, i, j)$ where (1) $q \in Q$ is the current state of $\Aa$, (2) $i, j \in \Nat$, with $i \le j$, denote the position of the tape heads $\lt$ and $\rt$ respectively, (3) no $u \in \out(q)$ appears as a substring of the string $T[i, j]$ (which is the part of the word processed so far after the last state change). At configuration $(q, i, j)$ the DSA reads the letter $T(j+1)$.
+%\begin{itemize}
+%\item $(q, i, j) \xra{T(j+1)} (q, i, j+1)$ if no string of $\out(q)$ is a suffix of $T[i, j+1]$,
+%\item $(q, i, j) \xra{T(j+1)} (q_u, j+1, j+1)$ if $u \in \out(q)$ is the longest string that appears as a suffix of $T[i, j+1]$ and $\Delta(q, u) = q_u$. 
+%\end{itemize}
+%A configuration $(q, i, j)$ is accepting if $q \in F$ and $i = j$. A \emph{run} is a sequence of transitions $\xra{}$. Notice that each word has a unique run: from a state, the first time there is a match, a transition is triggered; if there are multiple matches, we take the longest match. A word $w$ is accepted by $\Aa$ if the run of $\Aa$ on $w$ ends in an accepting configuration.
+
+We illustrate the semantics on an example. Consider the DSA in Figure~\ref{fig:dsa-examples} (b). Here is the sequence of configurations obtained on the word $bbaab$:
+\begin{align*}
+(q_0, \epsilon) \xra{b} (q_0, b) \xra{b} (q_0, b) \xra[ba]{a} (q_0, \epsilon) \xra{a} (q_0, a) \xra[ab]{b} (q_1, \epsilon)
+\end{align*}
 
