@@ -1,53 +1,12 @@
 \subsection{Experiments}
 \label{sec:experiments}
 We have implemented a prototype test generator for EDTs using the translation of EDTs to mDSA-with-outputs \cite{mDSAcode}. In our implementation, we translate the given EDT $\Tt$ into an mDSA-with-outputs $\Bb^\Tt$ and simulate the semantics of $\Bb^\Tt$ using the finite transition system $\Ssf^{\Bb^\Tt}$ described in the proof of Theorem~\ref{thm:complexity}.
-%A testsuite $\Pi(\Tt)$ for an EDT $\Tt$ is a set of executions such
-%that for each row $R$ of $\Tt$ there exists an execution
-%$\pi \in \Pi$ and $\pi$ triggers $R$. To find a testsuite, we need to solve the test generation problem for each row.
-%The testsuite generation problem is to check whether there exists a testsuite for a given EDT.
-%We have developed a prototype tool that implements an
-%algorithm to solve the test generation problem by systematically
-%exploring the configurations of an mDSA corresponding to the given EDT,
-%$\Tt$.  %The tool does not handle timing.
-%We conducted experiments to validate the following:
-%\begin{enumerate}
-%\item For simple EDTs, the tool can find test cases succesfully.
-%\item There are some EDTs for which it can solve the test
-%generation problem, where randomized techniques (likely) cannot.
-%\end{enumerate}
-%\texttt{Random} uniformly samples a set of executions, $\Pi_R(\Tt)$, of size
-%$N$, from the universal set of executions that have exactly $P$ inputs
-%and checks whether $\Pi_R(\Tt)$ is a testsuite for $\Tt$. \texttt{RGRaF}, on
-%the other hand, employs a heuristic to sample a set of executions of
-%size $N$ and checks whether it is a testsuite. \texttt{RGRaF} takes a parameter
-%$P$ to restrict the number of inputs in each execution.
-First we look at a couple of small EDTs. Suppose we want a testcase for Row 1 in Table~\ref{tab:edt-alarm} from Section~\ref{sec:edt}. Encoding this in our tool gives a testcase ($P; P$) for Row 1, when default values for $I$ and $A$ are set to $F$.
-%\begin{table}[h!]
-%  \centering \def\arraystretch{1.2}
-%  \caption{EDT for an Alarm module}
-%  \label{tab:alarm-2}
-%  \begin{tabular}{|c|c|c|c||c|c|}
-%    \hline
-%    sno & \specialcell{in \\ Ignition} &
-%                                         \specialcell{in \\ PanicSw} &
-%                                                                       \specialcell{in 
-%    \\ Alarm} & \specialcell{out \\ Alarm} & 
-%                                             \specialcell{out \\ Flash} \\
-%    \hline 
-%    1 & Off & (Press; Press)%\{$<1$s\} 
-%    & Off & On &
-%    \\
-%    \hline
-%
-%    2 & On & & & Off & False \\
-%    \hline
-%  \end{tabular}
-%  
-%\end{table}
+
+First we look at a couple of small EDTs. Suppose we want a testcase for Row 1 in Table~\ref{tab:edt-alarm}. Encoding this in our tool gives a testcase ($P; P$) for Row 1, when default values for $I$ and $A$ are set to $F$.
 Next we look at Table~\ref{tab:wiper}, a partial representation of a wiper module in a car. The tool finds a testcase (park;notpark) for Row 2.
 
 \begin{table}[h!]
-  \centering \def\arraystretch{1.1}
+  \centering \def\arraystretch{1}
   \caption{EDT for a Wiper module}
   \label{tab:wiper}
   \begin{tabular}{|c|c|c|c|c||c|c|}
@@ -70,23 +29,16 @@ Next we look at Table~\ref{tab:wiper}, a partial representation of a wiper modul
 \end{table}
 
 
-We now present an EDT for which our tool can solve the test generation problem, whereas randomized techniques will have low success probability. %we created a specific kind of EDT for
-%which the probability of randomized techniques selecting a required
-%execution is very low. 
+We now present an EDT for which our tool can solve the test generation problem, whereas randomized techniques will have low success probability. 
 The EDT is a slight variation of the $N$ bit counter presented in Section~\ref{sec:mdsao-synt}. We depict a part of the EDT for three bits in
-Table \ref{tab:binary}. %to five bits and adds a 
-%row to reset the counter. The description of $N$-bit counters was presented in Section~\ref{sec:mdsao-synt}. 
+Table \ref{tab:binary}. 
 In addition we add a row to check for all $t_i = 1$ , and also have an extra letter in the port $T$. Therefore there is exactly one sequence that makes all the $t_i$ equal to $1$. Randomized techniques have a low probability of generating such a test case. 
 Our prototype implementation generates a test case for $N=5$. 
 
- %For the  and hence for rows that have a very low probability of getting triggered
-%it is better than randomized techniques. 
-
-%Table \ref{tab:binary} shows a counter for $3$ bits.
 
 \begin{table}
   \centering
-  \renewcommand{\arraystretch}{1.1} 
+  \renewcommand{\arraystretch}{1} 
   \caption{Implementing a binary counter for $3$ bits}
   \label{tab:binary}
   \begin{tabular}{|c|c|c|c|c||c|c|c|c|}
@@ -111,7 +63,3 @@ Our prototype implementation generates a test case for $N=5$.
 
 Our goal with the experiments was not to present a scalable tool for EDT test generation. We aimed to create an open source simulator for mDSA-with-outputs, which we have applied on EDT test case generation. As future work, we plan to investigate scalable algorithms for reachability in mDSA-with-outputs.
 
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "m"
-%%% End:

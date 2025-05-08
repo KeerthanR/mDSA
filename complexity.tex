@@ -1,16 +1,16 @@
-%\section{Complexity of emptiness}
+
 
 \begin{theorem}\label{thm:complexity}
 Emptiness for mDSA with outputs is PSPACE-complete.
 \end{theorem}
 \begin{proof}
-    %\paragraph*{PSPACE upper bound.}
+    
     \emph{$\PSPACE$ upper bound.} Let $\Bb$ be an mDSA-with-outputs. Consider the transition system $\Ss^\Bb$ describing the semantics of $\Bb$. Each node in the transition system is of the form $(q, w, \theta)$ where $w$ can become arbitrarily long. Therefore, the transition system, viewed as it is, is infinite. Suppose $M$ is the maximum length among all words used in the transition labels of $\Aa$. This is the maximum length of a suffix that will be checked for in a transition. To detect whether $u_1 \parallel u_2 \parallel \cdots \parallel u_k$ matches a configuration $(q, w, \theta)$, it is sufficient to maintain the last $M$ letters seen in each port. We now explain how this can be implemented.
     
     Assume that in configuration $(q, w, \theta)$, every projection $\proj{i}(w)$ of the word $w$ has at most $M$ letters. We apply the criteria for verifying if $(u_1 \parallel u_2 \parallel \cdots \parallel u_k)$ matches the tape configuration $(w, \theta)$ as in Definition~\ref{def:match}. Now, when we append $a \in \Sigma_i$ to the end of $w$: if $wa$ contains $M+1$ letters in port $i$, that is $|\proj{i}(wa)| = M+1$, then let $w'$ be the word obtained by deleting from $wa$ the first occurrence of a letter in $\Sigma_i$. Let $b$ be this letter. If $b$ appeared at a position strictly greater than $\theta$ in $wa$, then we do not need to change the tape head ($\theta' = \theta$); otherwise, $b$ appears on or before $\theta$, and we reduce tape position by $1$ ($\theta' = \theta - 1$). This gives a new tape configuration $(w', \theta')$. Transitions point to the new truncated configuration. Call the new truncated transition system as $\Ssf^\Bb$.
     
     
-    This bounds the tape length to $M \times k$, where $k$ is the total number of ports. So, the total size of the truncated transition system is exponential in the size of the input. To verify emptiness, it is sufficient to guess a path in this transition system. Since each node requires polynomial space, and the length of the witness is bounded by an exponential in the size of the input, we deduce a $\PSPACE$ upper bound for the emptiness problem, following standard results from complexity theory.
+    This bounds the tape length to $M \times k$, where $k$ is the total number of ports. So, the total size of the truncated transition system is exponential in the size of the input. To verify emptiness, it is sufficient to guess a path in this transition system. Since each node requires polynomial space, and the length of the witness is bounded by an exponential in the size of the input, we deduce a $\PSPACE$ upper bound for the emptiness problem, following standard complexity theoretic arguments. 
 
     \emph{$\PSPACE$-hardness.} For the hardness, we give a reduction from this problem: given DFAs $D_1, D_2, \dots, D_n$ over a common alphabet $\Sigma$, the DFA-intersection-emptiness asks if there exists a word in the language of all the $n$ DFAs. This is known to be $\PSPACE$-complete~\cite{10.1109/SFCS.1977.16}. Let $D_j = (Q_j, q^{init}_j, \delta_j, F_j)$ be the description of DFA $D_j$. The mDSA-with-outputs $\Bb^D$ that we will construct makes use of $n$ ports to store the state reached by each of the DFAs.
 
