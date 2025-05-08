@@ -1,30 +1,35 @@
-\documentclass[runningheads,envcountsame]{llncs}
+\documentclass[runningheads]{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
 
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 
 \usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=cyan
-    }
+%\hypersetup{
+ %   colorlinks=true,
+ %   linkcolor=blue,  
+ %   filecolor=magenta,      
+ %   urlcolor=cyan
+ %     }
+
+\usepackage{color}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\urlstyle{rm}
 
 \usepackage{lineno}
 \usepackage{tikz}
-\usepackage{graphicx}
 \usepackage{thmtools}
-\usepackage{thm-restate}
 \usepackage{array}
 \usetikzlibrary{automata, positioning, arrows}
 
-\title{An automaton model to succinctly represent suffix-based specifications of a distributed system}
+\title{An automaton model to succinctly represent suffix-based specifications of a concurrent system}
 
-\titlerunning{An automaton model for suffix-based specifications of a distributed system}
+\titlerunning{An automaton model for suffix-based specifications of a concurrent system}
 
-\author{R Keerthan\inst{1,2} \and B Srivathsan\inst{2,3} \and
+\author{R Keerthan\inst{1,2} \and B Srivathsan\inst{2,3}\orcidID{0000-0003-2666-0691} \and
   R Venkatesh\inst{1}}
 
   \institute{Tata Consultancy Services - Innovation Labs, Pune \\
@@ -33,6 +38,7 @@
   \email{sri@cmi.ac.in} \and CNRS, ReLaX,
   IRL 2000, Siruseri, India }
 
+  \authorrunning{Keerthan et al.}
 
   %% Macros
 
@@ -64,7 +70,7 @@
   Deterministic Suffix-reading Automata (DSA) were introduced recently as a
 	  concise model for regular languages.  DSAs can succinctly capture formal
 	  specifications that are based on \emph{sequences} of input actions (and
-	  not just single actions). For a distributed system, specifications may
+	  not just single actions). For a concurrent system, specifications may
 	  further depend on combinations of input sequences seen across multiple
 	  components (ports).  For such systems, DSAs consider all possible
 	  interleavings, resulting in large and unreadable automata.
@@ -73,19 +79,7 @@
 	  transitions. The resulting \emph{multi-port DSAs (mDSAs)} can succinctly
 	  represent concurrent suffix-based specifications. Subsequently, we extend mDSAs to produce outputs on transitions, and show that state reachability becomes PSPACE-complete in the presence of outputs. Finally, we apply our results to the formal analysis of Expressive Decision Tables (EDT) -- an industry notation for specifying requirements of  reactive systems.
     
-    
-    %These mDSA-with-outputs We provide a formal
-	 % operational semantics for mDSAs and prove that emptiness for mDSAs is
-	  %PSPACE-complete.  Then, we apply our results to the analysis of Expressive
-	  % Decision Tables (EDTs) -- an industry notation for specifying requirements
-	  % of reactive systems. The EDT notation has been successfully deployed in
-	  % various industrial settings. However, arguably, due to a complex interplay
-	  % between concurrency and suffix-based conditions, the notation lacks a
-	  % rigorous operational semantics. As a result, existing test generation
-	  % algorithms for EDTs do not give any theoretical guarantees. Here, we
-	  % provide formal operational semantics for a fragment of the EDT notation
-	  % using mDSAs, and reduce EDT-test-generation to mDSA-emptiness.
-  
+    \keywords{Formal verification \and automata theory \and concurrency}
   \end{abstract}
   
   \input{intro.tex}
@@ -107,13 +101,13 @@
   \input{experiments}
 
   \input{conclusion}
-  %\input{related.tex}
+  
 
+  \begin{credits}
+    \subsubsection{\ackname} The authors thank Arjun Arul for his help with the implementation of the test generator explained in Section~\ref{sec:experiments}. We thank Sagar Verma for helpful discussions.  
+  \end{credits}
   \bibliographystyle{plain}
   \bibliography{mDSA-netys.bib}
 
-  \appendix
-
-  \input{examples.tex}
-  %\input{nbitcounter.tex}
+  
   \end{document}

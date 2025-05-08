@@ -1,5 +1,5 @@
-\subsubsection*{Related work.}
-Use of automata to model distributed systems has been explored widely.
+\paragraph*{Related work.}
+Use of automata to model concurrent systems has been explored widely.
 Esterel~\cite{DBLP:journals/scp/BerryG92} is a synchronous programming language
 that provides a parallel composition operator. Harel's
 Statecharts~\cite{DBLP:journals/scp/Harel87} also support parallel composition
@@ -15,10 +15,10 @@ letter of each port's alphabet will have to be represented using a place and
 the places combined to model the system. There is no mechanism to include suffix-based triggers. %This will not be as succinct as an
 %mDSA. 
 The work that is closest to ours is Input/Output Partial Order
-Automata (IOPOA)~\cite{10.5555/2391293.2391305}. In their work transitions
+Automata (IOPOA)~\cite{10.5555/2391293.2391305}. In their work, transitions
 execute non-atomically reacting to asynchronous inputs on several ports. The
 main differences between IOPOA and mDSA: in mDSA transitions react
 atomically, transition labels can be strings representing a suffix for each port and not just letters,
 and different transitions may trigger on the same string at a port. For example consider the mDSA in Figure~\ref{fig:mdsa-examples}(a), the transition from $\mathtt{Off}$ to $\mathtt{Started}$ and $\mathtt{Started}$ to $\mathtt{Drive}$ can be taken on the same input $B$. In an IOPOA this will require two occurences of $B$. IOPOA was primarily designed to enable test generation whereas the aim of mDSAs is succinct specification of requirements.
 
-\subsubsection*{Structure of the paper.} Section~\ref{sec:prelims} briefly recalls the syntax and semantics of Deterministic Suffix-reading Automata (DSA). In Section~\ref{sec:multiport}, we extend DSA with the parallel operator, and in section~\ref{sec:multiport-outputs}, we add the feature to produce outputs. Finally in Section~\ref{sec:edt}, we describe the EDT notation and the translation from EDT to multi-port DSA with outputs. 
+\paragraph*{Structure of the paper.} Section~\ref{sec:prelims} briefly recalls the syntax and semantics of Deterministic Suffix-reading Automata (DSA). In Section~\ref{sec:multiport}, we extend DSA with the parallel operator, and in section~\ref{sec:multiport-outputs}, we add the feature to produce outputs. Finally in Section~\ref{sec:edt}, we describe the EDT notation and the translation from EDT to multi-port DSA with outputs. 
